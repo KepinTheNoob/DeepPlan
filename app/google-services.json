@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "339912206624",
+    "project_id": "deepplan-cfbe6",
+    "storage_bucket": "deepplan-cfbe6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:339912206624:android:1864c56fe533288bd10f45",
+        "android_client_info": {
+          "package_name": "com.example.straverse"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBcJv8Xant1rqAYOrBhHKUv-uZw7myFw70"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
