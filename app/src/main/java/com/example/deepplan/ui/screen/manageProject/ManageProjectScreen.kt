@@ -24,7 +24,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.deepplan.ui.theme.StraVerseTheme
+import com.example.deepplan.ui.theme.Typography
+import com.example.deepplan.R
 
 val Typography = Typography(
     displaySmall = TextStyle(
@@ -57,9 +58,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            StraVerseTheme {
                 Homepage()
-            }
         }
     }
 }
@@ -159,10 +158,9 @@ fun Homepage() {
                 Button(
                     onClick = { /* Handle button click */ },
                     modifier = Modifier
-                        .fillMaxWidth(0.8f)
-                        .padding(bottom = 24.dp)
-                        .align(Alignment.CenterHorizontally),
-                    shape = RoundedCornerShape(12.dp),
+                        .align(Alignment.End) // Posisikan di kanan bawah
+                        .padding(bottom = 16.dp), // Tambahkan padding untuk jarak dari tepi
+                    shape = RoundedCornerShape(100.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
                     Row(
@@ -191,17 +189,18 @@ fun ProjectCard(project: Project) {
             .clip(RoundedCornerShape(12.dp)),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
     ) {
-        Row(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+                .background(MaterialTheme.colorScheme.primaryContainer, shape = RoundedCornerShape(12.dp))
+                .padding(start = 12.dp, end = 16.dp, top = 8.dp, bottom = 8.dp) // added end = 16.dp
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                // Circular progress indicator
+                // Left: Progress circle with %
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier.size(45.dp)
@@ -219,22 +218,22 @@ fun ProjectCard(project: Project) {
                     )
                 }
 
-                Spacer(modifier = Modifier.width(16.dp))
-
+                // Middle: Project name
                 Text(
                     text = project.name,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    textAlign = TextAlign.Right,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.End
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                // Right: Grid icon
+                Image(
+                    painter = painterResource(R.drawable.grid),
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp)
                 )
             }
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = "Options",
-                tint = MaterialTheme.colorScheme.onPrimaryContainer
-            )
         }
     }
 }
@@ -242,7 +241,5 @@ fun ProjectCard(project: Project) {
 @Preview(showBackground = true)
 @Composable
 fun HomepagePreview() {
-    StraVerseTheme {
         Homepage()
-    }
 }
