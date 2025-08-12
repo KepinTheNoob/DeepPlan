@@ -19,8 +19,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxColors
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LinearProgressIndicator
@@ -43,9 +48,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.deepplan.R
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.setValue
+import com.example.deepplan.ui.theme.DeepPlanTheme
 
-@Preview(showBackground = true)
+//@Preview(showBackground = false)
 @Composable
 fun Home() {
     var textBox by remember { mutableStateOf("") }
@@ -159,69 +166,69 @@ fun Home() {
 
                 Spacer(modifier = Modifier.height(22.dp))
 
-//                Card(
-//                    modifier = Modifier
-//                        .fillMaxWidth(),
-//                    colors = CardDefaults.cardColors(
-//                        containerColor = MaterialTheme.colorScheme.surfaceContainer
-//                    )
-//                ) {
-//                    Column (
-//                        modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 18.dp, end = 20.dp)
-//                    ) {
-//                        Text(
-//                            text = "Tip",
-//                            style = TextStyle(
-//                                fontWeight = FontWeight.Bold
-//                            )
-//                        )
-//
-//                        Spacer(modifier = Modifier.height(4.dp))
-//
-//                        Text(
-//                            text = "Consider giving a well detailed instructions on what the project is about.",
-//                        )
-//
-//                        Spacer(modifier = Modifier.height(20.dp))
-//
-//                        Text(
-//                            text = "I understand",
-//                            style = TextStyle(
-//                                color = MaterialTheme.colorScheme.primary,
-//                                textAlign = TextAlign.Right,
-//                                fontWeight = FontWeight.Bold
-//                            ),
-//                            modifier = Modifier.fillMaxWidth()
-//                        )
-//                    }
-//                }
-//
-//                Spacer(
-//                    modifier = Modifier.height(49.dp)
-//                )
-//
-//                Text(
-//                    text = "Summary",
-//                    style = TextStyle(
-//                        color = MaterialTheme.colorScheme.primary,
-//                        fontSize = 24.sp,
-//                        fontWeight = FontWeight.Bold
-//                    ),
-//                )
-//
-//                Spacer(modifier = Modifier.height(12.dp))
-//
-//                ExpandableBox("General Information", "Project Name: SMART")
-//
-//                ExpandableBox("Technical Scope", "Project Name: SMART")
-//
-//                ExpandableBox("External Context", "Project Name: SMART")
-//
-//                ExpandableBox("Internal Factors", "Project Name: SMART")
-//
-//                ExpandableBox("Prediction Results", "Project Name: SMART")
-//
-//                Spacer(modifier = Modifier.height(75.dp))
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer
+                    )
+                ) {
+                    Column (
+                        modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 18.dp, end = 20.dp)
+                    ) {
+                        Text(
+                            text = "Tip",
+                            style = TextStyle(
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        Text(
+                            text = "Consider giving a well detailed instructions on what the project is about.",
+                        )
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        Text(
+                            text = "I understand",
+                            style = TextStyle(
+                                color = MaterialTheme.colorScheme.primary,
+                                textAlign = TextAlign.Right,
+                                fontWeight = FontWeight.Bold
+                            ),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+
+                Spacer(
+                    modifier = Modifier.height(49.dp)
+                )
+
+                Text(
+                    text = "Summary",
+                    style = TextStyle(
+                        color = MaterialTheme.colorScheme.primary,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold
+                    ),
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                ExpandableBox("General Information", "Project Name: SMART")
+
+                ExpandableBox("Technical Scope", "Project Name: SMART")
+
+                ExpandableBox("External Context", "Project Name: SMART")
+
+                ExpandableBox("Internal Factors", "Project Name: SMART")
+
+                ExpandableBox("Prediction Results", "Project Name: SMART")
+
+                Spacer(modifier = Modifier.height(75.dp))
 
 
                     Column {
@@ -276,7 +283,38 @@ fun Home() {
                         Text(
                             text = "A dialog is a type of modal window that appears in front of app content to provide critical information, or prompt for a decision to be made."
                         )
+
+                        Spacer(modifier = Modifier.height(40.dp))
+
+                        CheckList()
                     }
+                }
+
+                Spacer(modifier = Modifier.height(55.dp))
+
+                Column (
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .background(Color(0xFFD9D9D9))
+                            .padding(vertical = 11.dp, horizontal = 45.dp)
+                            .clickable {  }
+                    ) {
+                        Text(
+                            text = "Edit Information"
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(9.dp))
+
+                    Text(
+                        text = "Warning: This will redo the prediction once and will overwrite current information, but you can still rollback to this version",
+                        style = TextStyle(
+                            fontSize = 13.sp
+                        )
+                    )
                 }
             }
         }
@@ -327,5 +365,86 @@ fun ExpandableBox(text: String, desc: String) {
                 )
             }
         }
+    }
+}
+
+@Composable
+fun CheckList() {
+    val items = listOf(
+        "Project Kick-off & Final Permits",
+        "Site Survey and Staking",
+        "Site Clearing and Grubbing"
+    )
+
+    val checkedStates = remember { mutableStateListOf(false, false, false) }
+
+    Column (
+        modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceContainer)
+    ) {
+        items.forEachIndexed { index, item ->
+            Row (
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = item,
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Normal
+                    ),
+                )
+
+                Checkbox(
+                    checked = checkedStates[index],
+                    onCheckedChange = { checkedStates[index] = it },
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = MaterialTheme.colorScheme.primary,
+                        checkmarkColor = Color.White
+                    )
+                )
+            }
+
+            if(index != items.lastIndex) {
+                Spacer(modifier = Modifier.height(8.dp))
+
+                HorizontalDivider(color = Color.Gray.copy(alpha = 0.4f), thickness = 1.dp)
+
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
+
+        Spacer(modifier = Modifier.height(42.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(end = 28.dp),
+            horizontalArrangement = Arrangement.End
+        ) {
+            Text(
+                text = "Add",
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.clickable {  }
+            )
+
+            Spacer(modifier = Modifier.width(47.dp))
+
+            Text(
+                text = "Edit",
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.clickable {  }
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+        }
+    }
+}
+
+@Preview(showBackground = false) // remove the forced white background
+@Composable
+fun HomePreview() {
+    DeepPlanTheme { // wrap in your app theme
+        Home()
     }
 }

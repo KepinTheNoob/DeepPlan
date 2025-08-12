@@ -5,6 +5,7 @@ import com.example.deepplan.R
 
 enum class Screen(val title: String) {
     Login("Login"),
-    Register("Register")
+    Register("Register"),
+    Home("Home")
 }
 

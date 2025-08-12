@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "StraVerse"
+rootProject.name = "DeepPlan"
 include(":app")
  

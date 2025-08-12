@@ -11,6 +11,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.deepplan.ui.screen.Screen
+import com.example.deepplan.ui.screen.home.Home
 import com.example.deepplan.ui.theme.DeepPlanTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,29 +25,28 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             DeepPlanTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                MainContent()
             }
         }
     }
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    DeepPlanTheme {
-        Greeting("Android")
+fun MainContent() {
+    NavHost(
+        navController = rememberNavController(),
+        startDestination = Screen.Home.name
+    ) {
+        composable(Screen.Home.name) {
+            Home()
+        }
     }
 }
+
+//@Preview(showBackground = true)
+//@Composable
+//fun GreetingPreview() {
+//    DeepPlanTheme {
+//        MainContent()
+//    }
+//}
