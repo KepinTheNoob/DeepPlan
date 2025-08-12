@@ -20,6 +20,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.deepplan.ui.screen.manageProject.Homepage
 import com.example.deepplan.ui.screen.newProject.ExternalContextScreen
 import com.example.deepplan.ui.screen.newProject.InternalFactorsScreen
 import com.example.deepplan.ui.screen.newProject.TechnicalScopeScreen
@@ -62,7 +63,7 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier
                             .padding(innerPadding)
                     ) {
-                        ManagePro
+                        Homepage()
                     }
                 }
             }

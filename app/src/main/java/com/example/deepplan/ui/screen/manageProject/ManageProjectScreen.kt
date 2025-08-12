@@ -3,6 +3,7 @@ package com.example.deepplan.ui.screen.manageProject
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,7 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -94,28 +95,27 @@ fun Homepage() {
                         contentDescription = "Menu",
                         tint = MaterialTheme.colorScheme.onPrimary
                     )
-                    Icon(
-                        imageVector = Icons.Default.Add, // Using Add as a placeholder for the user icon
-                        contentDescription = "User Profile",
-                        tint = MaterialTheme.colorScheme.onPrimary
-                    )
+//                    Image(
+//                        painter = painterResource(id = com.example.deepplan.R.drawable.avatar), // Use your image name here
+//                        contentDescription = "User Profile",
+//                        modifier = Modifier.size(24.dp), // Set the desired size for the image
+//                    )
                 }
-
-                // Welcome text
+                
                 Text(
                     text = "Welcome to\nDeepPlan",
                     style = MaterialTheme.typography.displaySmall,
+                    fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onPrimary,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
 
-            // Bottom Section - The white content area
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(0.6f) // Takes up a larger portion of the screen
+                    .weight(0.6f)
                     .padding(horizontal = 24.dp)
             ) {
                 // "Your projects" header
@@ -194,7 +194,7 @@ fun ProjectCard(project: Project) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -204,13 +204,13 @@ fun ProjectCard(project: Project) {
                 // Circular progress indicator
                 Box(
                     contentAlignment = Alignment.Center,
-                    modifier = Modifier.size(50.dp)
+                    modifier = Modifier.size(45.dp)
                 ) {
                     CircularProgressIndicator(
                         progress = project.progress,
                         modifier = Modifier.size(45.dp),
                         color = MaterialTheme.colorScheme.primary,
-                        strokeWidth = 3.dp
+                        strokeWidth = 6.dp
                     )
                     Text(
                         text = "${(project.progress * 100).toInt()}%",
@@ -224,12 +224,14 @@ fun ProjectCard(project: Project) {
                 Text(
                     text = project.name,
                     style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    textAlign = TextAlign.Right,
                     modifier = Modifier.weight(1f)
                 )
             }
             Icon(
-                imageVector = Icons.Default.Add, // Placeholder for the 3x3 grid icon
+                imageVector = Icons.Default.Add,
                 contentDescription = "Options",
                 tint = MaterialTheme.colorScheme.onPrimaryContainer
             )
@@ -239,7 +241,7 @@ fun ProjectCard(project: Project) {
 
 @Preview(showBackground = true)
 @Composable
-fun DeepPlanUIPreview() {
+fun HomepagePreview() {
     StraVerseTheme {
         Homepage()
     }
