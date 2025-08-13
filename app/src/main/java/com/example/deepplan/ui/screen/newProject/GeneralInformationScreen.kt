@@ -1,5 +1,6 @@
 package com.example.deepplan.ui.screen.newProject
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -36,27 +38,34 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.example.deepplan.data.Screen
 import com.example.deepplan.ui.theme.Typography
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GeneralInformationScreen(
-    viewModel: NewProjectViewModel
+    viewModel: NewProjectViewModel,
+    navController: NavHostController = rememberNavController(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
     var scrollState = rememberScrollState()
-    var projectName by remember { mutableStateOf("") }
-    var numberOfMainTasks by remember { mutableStateOf("") }
+    var projectName by remember { mutableStateOf(uiState.projectName) }
+    var numberOfMainTasks by remember { mutableStateOf(uiState.numberOfMainTasks.toString()) }
     var designAndBuildExpanded by remember { mutableStateOf(false) }
-    var selectedDesignAndBuild by remember { mutableStateOf("Yes") }
+    var selectedDesignAndBuild by remember { mutableStateOf(
+        if (uiState.isItDesignAndBuild) "Yes" else "No"
+    ) }
     val designAndBuildOptions = listOf("Yes", "No")
     var projectTypeExpanded by remember { mutableStateOf(false) }
-    var selectedProjectType by remember { mutableStateOf("Perumahan") }
+    var selectedProjectType by remember { mutableStateOf(uiState.projectType) }
     val projectTypes = listOf(
         "Perumahan",
         "Jalan Tol",
@@ -66,7 +75,7 @@ fun GeneralInformationScreen(
         "Pabrik",
     )
     var clientTypeExpanded by remember { mutableStateOf(false) }
-    var selectedClientType by remember { mutableStateOf("BUMN") }
+    var selectedClientType by remember { mutableStateOf(uiState.clientType) }
     val clientTypes = listOf(
         "BUMN",
         "Swasta Asing",
@@ -74,7 +83,7 @@ fun GeneralInformationScreen(
         "Pemda",
     )
     var contractTypeExpanded by remember { mutableStateOf(false) }
-    var selectedContractType by remember { mutableStateOf("Lump Sum") }
+    var selectedContractType by remember { mutableStateOf(uiState.contractType) }
     val contractTypes = listOf(
         "Lump Sum",
         "Cost Plus",
@@ -362,8 +371,16 @@ fun GeneralInformationScreen(
                 )
                 TextField(
                     value = numberOfMainTasks,
-                    onValueChange = { numberOfMainTasks = it },
+                    onValueChange = {
+                        try {
+                            it.toInt()
+                            numberOfMainTasks = it
+                        } catch (e: NumberFormatException) {
+                            numberOfMainTasks = ""
+                        }
+                    },
                     singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     textStyle = MaterialTheme.typography.bodyLarge.copy(
                         fontSize = 14.sp
                     ),
@@ -410,7 +427,18 @@ fun GeneralInformationScreen(
                 }
             }
             Button(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    viewModel.setGeneralInformationValues(
+                        projectName,
+                        selectedProjectType,
+                        selectedClientType,
+                        selectedContractType,
+                        if (selectedDesignAndBuild == "Yes") true else false,
+                        numberOfMainTasks.toInt()
+                    )
+
+                    navController.navigate(Screen.NewProjectTechnicalScope.name)
+                },
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
                 modifier = Modifier
                     .padding(end = 36.dp, bottom = 24.dp, top = 24.dp)

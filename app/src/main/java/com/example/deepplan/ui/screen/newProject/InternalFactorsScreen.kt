@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -23,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,19 +34,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.deepplan.ui.theme.Typography
 import com.example.deepplan.R
+import com.example.deepplan.data.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InternalFactorsScreen() {
+fun InternalFactorsScreen(
+    viewModel: NewProjectViewModel,
+    navController: NavHostController = rememberNavController(),
+) {
+    val uiState by viewModel.uiState.collectAsState()
+
     var scrollState = rememberScrollState()
-    var projectManagerExperienceYears by remember { mutableStateOf("") }
-    var coreTeamSize by remember { mutableStateOf("") }
-    var subcontractorPercentage by remember { mutableStateOf("") }
+    var projectManagerExperienceYears by remember { mutableStateOf(uiState.projectManagerExperienceYears.toString()) }
+    var coreTeamSize by remember { mutableStateOf(uiState.coreTeamSize.toString()) }
+    var subcontractorPercentage by remember { mutableStateOf(uiState.subcontractorPercentage.toString()) }
 
     Box(
         modifier = Modifier
@@ -96,7 +108,15 @@ fun InternalFactorsScreen() {
 
                 TextField(
                     value = projectManagerExperienceYears,
-                    onValueChange = { projectManagerExperienceYears = it },
+                    onValueChange = {
+                        try {
+                            it.toInt()
+                            projectManagerExperienceYears = it
+                        } catch (e: NumberFormatException) {
+                            projectManagerExperienceYears = ""
+                        }
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
                     textStyle = MaterialTheme.typography.bodyLarge.copy(
                         fontSize = 14.sp
@@ -133,7 +153,15 @@ fun InternalFactorsScreen() {
 
                 TextField(
                     value = coreTeamSize,
-                    onValueChange = { coreTeamSize = it },
+                    onValueChange = {
+                        try {
+                            it.toInt()
+                            coreTeamSize = it
+                        } catch (e: NumberFormatException) {
+                            coreTeamSize = ""
+                        }
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
                     textStyle = MaterialTheme.typography.bodyLarge.copy(
                         fontSize = 14.sp
@@ -170,7 +198,15 @@ fun InternalFactorsScreen() {
 
                 TextField(
                     value = subcontractorPercentage,
-                    onValueChange = { subcontractorPercentage = it },
+                    onValueChange = {
+                        try {
+                            it.toFloat()
+                            subcontractorPercentage = it
+                        } catch (e: NumberFormatException) {
+                            subcontractorPercentage = ""
+                        }
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
                     textStyle = MaterialTheme.typography.bodyLarge.copy(
                         fontSize = 14.sp
@@ -191,7 +227,15 @@ fun InternalFactorsScreen() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Button(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    viewModel.setInternalContextValues(
+                        projectManagerExperienceYears.toInt(),
+                        coreTeamSize.toInt(),
+                        subcontractorPercentage.toFloat()
+                    )
+
+                    navController.navigate(Screen.NewProjectExternalContext.name)
+                },
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
             ) {
                 Row(
@@ -211,7 +255,7 @@ fun InternalFactorsScreen() {
                 }
             }
             Button(
-                onClick = { /*TODO*/ },
+                onClick = { /* TODO */ },
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.onPrimaryContainer)
             ) {
                 Row(
@@ -237,5 +281,7 @@ fun InternalFactorsScreen() {
 @Preview(showBackground = true)
 @Composable
 fun InternalFactorsScreenPreview() {
-    InternalFactorsScreen()
+    InternalFactorsScreen(
+        viewModel = viewModel(),
+    )
 }

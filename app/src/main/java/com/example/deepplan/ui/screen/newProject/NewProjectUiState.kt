@@ -7,11 +7,11 @@ data class NewProjectUiState (
     val clientType: String = "",
     val contractType: String = "",
     val isItDesignAndBuild: Boolean = true,
-    val numberOfMainTasks: Int = 1,
+    val numberOfMainTasks: Int = 0,
 
     // Technical Scope
-    val initialContractValue: Int = 0,
-    val estimatedTotalManHours: Int = 0,
+    val initialContractValue: Float = 0f,
+    val estimatedTotalManHours: Float = 0f,
     val earthworkVolume: Float = 0f,
     val concreteVolume: Float = 0f,
     val structuralSteelWeight: Float = 0f,
@@ -23,7 +23,7 @@ data class NewProjectUiState (
     val areaType: String = "",
     val season: String = "",
     val geotechnicalRiskLevel: Int = 1,
-    val comodityPriceIndex: Float = 0f,
+    val commodityPriceIndex: Float = 0f,
     val numberOfTenderCompetitor: Int = 0,
 
     // Internal Factors

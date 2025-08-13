@@ -26,10 +26,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.example.deepplan.data.Screen
 import com.example.deepplan.ui.screen.home.Home
+import com.example.deepplan.ui.screen.newProject.ExternalContextScreen
 import com.example.deepplan.ui.screen.newProject.GeneralInformationScreen
+import com.example.deepplan.ui.screen.newProject.InternalFactorsScreen
 import com.example.deepplan.ui.screen.newProject.NewProjectViewModel
+import com.example.deepplan.ui.screen.newProject.TechnicalScopeScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,7 +55,12 @@ fun MainScreenBar(
         navigationIcon = {
             if (currentScreen in  listOf<Screen>(Screen.Home)) {
                 // Taro App Bar Home disini
-            } else if (currentScreen in listOf<Screen>(Screen.NewProjectGeneralInformation)) {
+            } else if (currentScreen in listOf<Screen>(
+                    Screen.NewProjectGeneralInformation,
+                    Screen.NewProjectTechnicalScope,
+                    Screen.NewProjectExternalContext,
+                    Screen.NewProjectInternalFactors
+            )) {
                 IconButton (
                     onClick = {},
                     colors = IconButtonDefaults.iconButtonColors(
@@ -71,12 +80,12 @@ fun MainScreenBar(
 @Composable
 fun MainContent(
     startScreen: Screen,
-    navController: NavController,
+    navController: NavHostController,
     innerPadding: PaddingValues,
     newProjectViewModel: NewProjectViewModel,
 ) {
     NavHost(
-        navController = rememberNavController(),
+        navController = navController,
         startDestination = startScreen.name,
         modifier = Modifier.padding(innerPadding)
     ) {
@@ -86,7 +95,29 @@ fun MainContent(
 
         composable(Screen.NewProjectGeneralInformation.name) {
             GeneralInformationScreen(
-                viewModel = newProjectViewModel
+                viewModel = newProjectViewModel,
+                navController = navController,
+            )
+        }
+
+        composable(Screen.NewProjectTechnicalScope.name) {
+            TechnicalScopeScreen(
+                viewModel = newProjectViewModel,
+                navController = navController,
+            )
+        }
+
+        composable(Screen.NewProjectExternalContext.name) {
+            ExternalContextScreen(
+                viewModel = newProjectViewModel,
+                navController = navController,
+            )
+        }
+
+        composable(Screen.NewProjectInternalFactors.name) {
+            InternalFactorsScreen(
+                viewModel = newProjectViewModel,
+                navController = navController,
             )
         }
     }

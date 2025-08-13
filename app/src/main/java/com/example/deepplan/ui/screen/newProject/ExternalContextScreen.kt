@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -29,6 +30,7 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -38,17 +40,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.example.deepplan.data.Screen
 import com.example.deepplan.ui.theme.Typography
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExternalContextScreen() {
+fun ExternalContextScreen(
+    viewModel: NewProjectViewModel,
+    navController: NavHostController = rememberNavController(),
+    ) {
+    val uiState by viewModel.uiState.collectAsState()
+
     var scrollState = rememberScrollState()
-    var selectedLocation by remember { mutableStateOf("DKI Jakarta") }
+    var selectedLocation by remember { mutableStateOf(uiState.location) }
     var locationExpanded by remember { mutableStateOf(false) }
     val locations = listOf(
         "Kalimantan Timur",
@@ -91,9 +103,8 @@ fun ExternalContextScreen() {
         "DI Yogyakarta",
     )
 
-
     var areaTypeExpanded by remember { mutableStateOf(false) }
-    var selectedAreaType by remember { mutableStateOf("Urban") }
+    var selectedAreaType by remember { mutableStateOf(uiState.areaType) }
     val areaTypes = listOf(
         "Urban",
         "Sub-urban",
@@ -101,13 +112,14 @@ fun ExternalContextScreen() {
     )
 
     var seasonExpanded by remember { mutableStateOf(false) }
-    var selectedSeason by remember { mutableStateOf("Hujan") }
+    var selectedSeason by remember { mutableStateOf(uiState.season) }
     val seasons = listOf("Hujan", "Kemarau")
 
-    var comodityPriceIndex by remember { mutableStateOf("") }
+    var geotechnicalRiskLevel by remember { mutableFloatStateOf(uiState.geotechnicalRiskLevel.toFloat()) }
 
-    var numberOfTenderCompetitor by remember { mutableStateOf("") }
-    var sliderPosition by remember { mutableFloatStateOf(1f) }
+    var comodityPriceIndex by remember { mutableStateOf(uiState.commodityPriceIndex.toString()) }
+
+    var numberOfTenderCompetitor by remember { mutableStateOf(uiState.numberOfTenderCompetitor.toString()) }
 
 
     Box(
@@ -315,8 +327,8 @@ fun ExternalContextScreen() {
                     )
                 )
                 Slider(
-                    value = sliderPosition,
-                    onValueChange = { sliderPosition = it },
+                    value = geotechnicalRiskLevel,
+                    onValueChange = { geotechnicalRiskLevel = it },
                     valueRange = 1f..5f,
                     steps = 3,
                     colors = SliderDefaults.colors(
@@ -327,7 +339,7 @@ fun ExternalContextScreen() {
                     modifier = Modifier.fillMaxWidth()
                 )
                 Text(
-                    text = sliderPosition.roundToInt().toString(),
+                    text = geotechnicalRiskLevel.roundToInt().toString(),
                     color = MaterialTheme.colorScheme.surface,
                     style = Typography.labelLarge,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -359,7 +371,15 @@ fun ExternalContextScreen() {
 
                 TextField(
                     value = comodityPriceIndex,
-                    onValueChange = { comodityPriceIndex = it },
+                    onValueChange = {
+                        try {
+                            it.toFloat()
+                            comodityPriceIndex = it
+                        } catch (e: NumberFormatException) {
+                            comodityPriceIndex = ""
+                        }
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
                     textStyle = MaterialTheme.typography.bodyLarge.copy(
                         fontSize = 14.sp
@@ -393,7 +413,15 @@ fun ExternalContextScreen() {
                 )
                 TextField(
                     value = numberOfTenderCompetitor,
-                    onValueChange = { numberOfTenderCompetitor = it },
+                    onValueChange = {
+                        try {
+                            it.toInt()
+                            numberOfTenderCompetitor = it
+                        } catch (e: NumberFormatException) {
+                            numberOfTenderCompetitor = ""
+                        }
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
                     textStyle = MaterialTheme.typography.bodyLarge.copy(
                         fontSize = 14.sp
@@ -419,7 +447,18 @@ fun ExternalContextScreen() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Button(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    viewModel.setExternalContextValues(
+                        selectedLocation,
+                        selectedAreaType,
+                        selectedSeason,
+                        geotechnicalRiskLevel.toInt(),
+                        comodityPriceIndex.toFloat(),
+                        numberOfTenderCompetitor.toInt()
+                    )
+
+                    navController.navigate(Screen.NewProjectTechnicalScope.name)
+                },
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
                 modifier = Modifier
                     .padding(start = 36.dp, bottom = 24.dp, top = 24.dp)
@@ -441,7 +480,18 @@ fun ExternalContextScreen() {
                 }
             }
             Button(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    viewModel.setExternalContextValues(
+                        selectedLocation,
+                        selectedAreaType,
+                        selectedSeason,
+                        geotechnicalRiskLevel.toInt(),
+                        comodityPriceIndex.toFloat(),
+                        numberOfTenderCompetitor.toInt()
+                    )
+
+                    navController.navigate(Screen.NewProjectInternalFactors.name)
+                },
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
                 modifier = Modifier
                     .padding(end = 36.dp, bottom = 24.dp, top = 24.dp)
@@ -469,5 +519,7 @@ fun ExternalContextScreen() {
 @Preview(showBackground=true)
 @Composable
 fun ExternalContextScreenPreview() {
-    ExternalContextScreen()
+    ExternalContextScreen(
+        viewModel = viewModel()
+    )
 }

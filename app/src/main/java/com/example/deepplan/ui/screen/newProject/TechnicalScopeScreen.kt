@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -27,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -35,22 +37,32 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.deepplan.data.Screen
 import com.example.deepplan.ui.theme.Typography
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TechnicalScopeScreen() {
+fun TechnicalScopeScreen(
+    viewModel: NewProjectViewModel,
+    navController: NavController = rememberNavController(),
+    ) {
+    val uiState by viewModel.uiState.collectAsState()
+
     var scrollState = rememberScrollState()
-    var initialContractValue by remember { mutableStateOf("") }
-    var estimatedTotalManHours by remember { mutableStateOf("") }
-    var earthworkVolume by remember { mutableStateOf("") }
-    var concreteVolume by remember { mutableStateOf("") }
-    var structuralSteelWeight by remember { mutableStateOf("") }
-    var mainInstallationLength by remember { mutableStateOf("") }
-    var numberOfInstallationEndpoint by remember { mutableStateOf("") }
+    var initialContractValue by remember { mutableStateOf(uiState.initialContractValue.toString()) }
+    var estimatedTotalManHours by remember { mutableStateOf(uiState.estimatedTotalManHours.toString()) }
+    var earthworkVolume by remember { mutableStateOf(uiState.earthworkVolume.toString()) }
+    var concreteVolume by remember { mutableStateOf(uiState.concreteVolume.toString()) }
+    var structuralSteelWeight by remember { mutableStateOf(uiState.structuralSteelWeight.toString()) }
+    var mainInstallationLength by remember { mutableStateOf(uiState.mainInstallationLength.toString()) }
+    var numberOfInstallationEndpoint by remember { mutableStateOf(uiState.numberOfInstallationEndpoint.toString()) }
 
     Box(
         modifier = Modifier
@@ -100,10 +112,17 @@ fun TechnicalScopeScreen() {
                     )
                 )
 
-
                 TextField(
                     value = initialContractValue,
-                    onValueChange = { initialContractValue = it },
+                    onValueChange = {
+                        try {
+                            it.toFloat()
+                            initialContractValue = it
+                        } catch (e: NumberFormatException) {
+                            initialContractValue = ""
+                        }
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
                     textStyle = MaterialTheme.typography.bodyLarge.copy(
                         fontSize = 14.sp
@@ -131,7 +150,15 @@ fun TechnicalScopeScreen() {
 
                 TextField(
                     value = estimatedTotalManHours,
-                    onValueChange = { estimatedTotalManHours = it },
+                    onValueChange = {
+                        try {
+                            it.toFloat()
+                            estimatedTotalManHours = it
+                        } catch (e: NumberFormatException) {
+                            estimatedTotalManHours = ""
+                        }
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
                     textStyle = MaterialTheme.typography.bodyLarge.copy(
                         fontSize = 14.sp
@@ -168,7 +195,15 @@ fun TechnicalScopeScreen() {
 
                 TextField(
                     value = earthworkVolume,
-                    onValueChange = { earthworkVolume = it },
+                    onValueChange = {
+                        try {
+                            it.toFloat()
+                            earthworkVolume = it
+                        } catch (e: NumberFormatException) {
+                            earthworkVolume = ""
+                        }
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
                     textStyle = MaterialTheme.typography.bodyLarge.copy(
                         fontSize = 14.sp
@@ -205,7 +240,15 @@ fun TechnicalScopeScreen() {
 
                 TextField(
                     value = concreteVolume,
-                    onValueChange = { concreteVolume = it },
+                    onValueChange = {
+                        try {
+                            it.toFloat()
+                            concreteVolume = it
+                        } catch (e: NumberFormatException) {
+                            concreteVolume = ""
+                        }
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
                     textStyle = MaterialTheme.typography.bodyLarge.copy(
                         fontSize = 14.sp
@@ -243,7 +286,15 @@ fun TechnicalScopeScreen() {
 
                 TextField(
                     value = structuralSteelWeight,
-                    onValueChange = { structuralSteelWeight = it },
+                    onValueChange = {
+                        try {
+                            it.toFloat()
+                            structuralSteelWeight = it
+                        } catch (e: NumberFormatException) {
+                            structuralSteelWeight = ""
+                        }
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
                     textStyle = MaterialTheme.typography.bodyLarge.copy(
                         fontSize = 14.sp
@@ -277,7 +328,15 @@ fun TechnicalScopeScreen() {
                 )
                 TextField(
                     value = mainInstallationLength,
-                    onValueChange = { mainInstallationLength = it },
+                    onValueChange = {
+                        try {
+                            it.toFloat()
+                            mainInstallationLength = it
+                        } catch (e: NumberFormatException) {
+                            mainInstallationLength = ""
+                        }
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
                     textStyle = MaterialTheme.typography.bodyLarge.copy(
                         fontSize = 14.sp
@@ -312,7 +371,15 @@ fun TechnicalScopeScreen() {
                 )
                 TextField(
                     value = numberOfInstallationEndpoint,
-                    onValueChange = { numberOfInstallationEndpoint = it },
+                    onValueChange = {
+                        try {
+                            it.toInt()
+                            numberOfInstallationEndpoint = it
+                        } catch (e: NumberFormatException) {
+                            numberOfInstallationEndpoint = ""
+                        }
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
                     textStyle = MaterialTheme.typography.bodyLarge.copy(
                         fontSize = 14.sp
@@ -336,7 +403,19 @@ fun TechnicalScopeScreen() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Button(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    viewModel.setTechnicalScopeValues(
+                        initialContractValue.toFloat(),
+                        estimatedTotalManHours.toFloat(),
+                        earthworkVolume.toFloat(),
+                        concreteVolume.toFloat(),
+                        structuralSteelWeight.toFloat(),
+                        mainInstallationLength.toFloat(),
+                        numberOfInstallationEndpoint.toInt()
+                    )
+
+                    navController.navigate(Screen.NewProjectGeneralInformation.name)
+                },
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
                 modifier = Modifier
                     .padding(start = 36.dp, bottom = 24.dp, top = 24.dp)
@@ -358,7 +437,19 @@ fun TechnicalScopeScreen() {
                 }
             }
             Button(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    viewModel.setTechnicalScopeValues(
+                        initialContractValue.toFloat(),
+                        estimatedTotalManHours.toFloat(),
+                        earthworkVolume.toFloat(),
+                        concreteVolume.toFloat(),
+                        structuralSteelWeight.toFloat(),
+                        mainInstallationLength.toFloat(),
+                        numberOfInstallationEndpoint.toInt()
+                    )
+
+                    navController.navigate(Screen.NewProjectExternalContext.name)
+                },
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
                 modifier = Modifier
                     .padding(end = 36.dp, bottom = 24.dp, top = 24.dp)
@@ -386,5 +477,7 @@ fun TechnicalScopeScreen() {
 @Preview(showBackground=true)
 @Composable
 fun TechnicalScopeScreenPreview() {
-    TechnicalScopeScreen()
+    TechnicalScopeScreen(
+        viewModel = viewModel(),
+    )
 }
