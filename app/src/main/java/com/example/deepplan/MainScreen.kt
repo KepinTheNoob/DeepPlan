@@ -130,9 +130,9 @@ fun MainScreen(
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = Screen.valueOf(
-        backStackEntry?.destination?.route ?: Screen.NewProjectGeneralInformation.name
+        backStackEntry?.destination?.route ?: Screen.Home.name
     )
-    var startScreen by remember { mutableStateOf<Screen>(Screen.NewProjectGeneralInformation) }
+    var startScreen by remember { mutableStateOf<Screen>(Screen.Home) }
 
     when (currentScreen) {
         Screen.Home -> {

@@ -38,7 +38,6 @@ class Predictor {
         pengalaman_pm_tahun: Int,
         jumlah_sdm_inti: Int,
         persentase_subkontraktor: Int
-
     ) {
         val client = OkHttpClient()
         val mediaType = "application/json".toMediaType()
