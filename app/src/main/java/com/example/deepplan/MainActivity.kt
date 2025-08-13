@@ -15,7 +15,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.deepplan.ui.screen.Screen
+import com.example.deepplan.data.Screen
 import com.example.deepplan.ui.screen.home.Home
 import com.example.deepplan.ui.theme.DeepPlanTheme
 
@@ -25,28 +25,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             DeepPlanTheme {
-                MainContent()
+                MainScreen()
             }
         }
     }
 }
-
-@Composable
-fun MainContent() {
-    NavHost(
-        navController = rememberNavController(),
-        startDestination = Screen.Home.name
-    ) {
-        composable(Screen.Home.name) {
-            Home()
-        }
-    }
-}
-
-//@Preview(showBackground = true)
-//@Composable
-//fun GreetingPreview() {
-//    DeepPlanTheme {
-//        MainContent()
-//    }
-//}

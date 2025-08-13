@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.deepplan.AuthState
 import com.example.deepplan.AuthViewModel
-import com.example.deepplan.ui.screen.Screen
+import com.example.deepplan.data.Screen
 
 @Composable
 fun Login(navController: NavHostController, authViewModel: AuthViewModel) {
