@@ -27,11 +27,16 @@ import androidx.compose.material3.CheckboxColors
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RichTooltip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -165,6 +170,8 @@ fun Home() {
                 )
 
                 Spacer(modifier = Modifier.height(22.dp))
+
+//                MyTooltipExample()
 
                 Card(
                     modifier = Modifier
@@ -367,6 +374,23 @@ fun ExpandableBox(text: String, desc: String) {
         }
     }
 }
+
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//fun MyTooltipExample() {
+//    TooltipBox(
+//        positionProvider = TooltipDefaults.rememberRichTooltipPositionProvider(),
+//        tooltip = {
+//            RichTooltip {
+//                Text("Test 1")
+//            }
+//        },
+//        state = rememberTooltipState()
+//    ) {
+//        Text("Test 2")
+//    }
+//}
+
 
 @Composable
 fun CheckList() {
