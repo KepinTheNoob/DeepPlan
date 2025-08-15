@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 import androidx.lifecycle.ViewModel
+import com.google.firebase.firestore.FirebaseFirestore
 
 class AuthViewModel : ViewModel() {
     private val auth : FirebaseAuth = FirebaseAuth.getInstance()
@@ -42,8 +43,8 @@ class AuthViewModel : ViewModel() {
             }
     }
 
-    fun signup(email : String, password : String) {
-        if(email.isEmpty() || password.isEmpty()) {
+    fun signup(email : String, password : String, username: String) {
+        if(email.isEmpty() || password.isEmpty() || username.isEmpty()) {
             _authState.value = AuthState.Error("Email or password can't be empty")
             return
         }
@@ -52,7 +53,23 @@ class AuthViewModel : ViewModel() {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener{task->
                 if(task.isSuccessful) {
-                    _authState.value = AuthState.Authenticated
+                    val userId = auth.currentUser?.uid ?: return@addOnCompleteListener
+
+                    val db = FirebaseFirestore.getInstance()
+                    val userData = hashMapOf(
+                        "email" to email,
+                        "username" to username
+                    )
+
+                    db.collection("users")
+                        .document(userId)
+                        .set(userData)
+                        .addOnSuccessListener {
+                            _authState.value = AuthState.Authenticated
+                        }
+                        .addOnFailureListener { e ->
+                            _authState.value = AuthState.Error("Account created but failed to save user data: ${e.message}")
+                        }
                 }
                 else {
                     _authState.value = AuthState.Error(task.exception?.message?:"Something went wrong")
