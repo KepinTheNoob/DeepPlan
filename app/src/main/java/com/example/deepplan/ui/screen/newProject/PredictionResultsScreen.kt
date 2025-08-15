@@ -35,6 +35,7 @@ import com.example.deepplan.ui.theme.Typography
 @Composable
 fun PredictionResultsScreen(
     viewModel: NewProjectViewModel,
+    navController: NavHostController = rememberNavController(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var showPredictionResultsContent by remember { mutableStateOf(false) }
@@ -56,7 +57,7 @@ fun PredictionResultsScreen(
         showPredictionResultsContent && uiState.predictionCompleted -> {
             PredictionResultsContent(
                 viewModel,
-                isPredictionPositive = false
+                navController
             )
         }
     }
@@ -65,7 +66,7 @@ fun PredictionResultsScreen(
 @Composable
 fun PredictionResultsContent(
     viewModel: NewProjectViewModel,
-    isPredictionPositive: Boolean,
+    navController: NavHostController = rememberNavController(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var scrollState = rememberScrollState()
@@ -103,7 +104,7 @@ fun PredictionResultsContent(
                     .fillMaxWidth()
                     .padding(top = 30.dp)
             ) {
-                if (isPredictionPositive) {
+                if (uiState.goodPrediction) {
                     Icon(
                         painter = painterResource(R.drawable.baseline_check_24),
                         contentDescription = "Good Result",
@@ -215,7 +216,7 @@ fun PredictionResultsContent(
                     .padding(start = 19.dp, end = 19.dp, top = 19.dp)
             ) {
                 Text(
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed id ligula ut tellus posuere vulputate. Donec pulvinar, mi sit amet consectetur sodales, augue orci posuere sem, quis hendrerit neque erat vitae dolor. Duis maximus sollicitudin sagittis. Sed vestibulum, leo vel lacinia tincidunt, nisi purus vestibulum leo, in pretium est sem quis nisl. Praesent ipsum sem, molestie in bibendum a, lacinia ac nibh. Donec magna dolor, bibendum vel arcu sit amet, placerat mattis nisi. Quisque eget posuere libero. Nulla a dolor convallis, condimentum felis vel, tincidunt eros.",
+                    uiState.reason,
                     color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Normal,
@@ -240,7 +241,10 @@ fun PredictionResultsContent(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Button(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    viewModel.setPredictionCompleted(false)
+                    navController.navigate(Screen.NewProjectGeneralInformation.name)
+                },
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
                 modifier = Modifier
                     .padding(start = 40.dp, bottom = 24.dp, top = 24.dp)
@@ -252,7 +256,10 @@ fun PredictionResultsContent(
                 )
             }
             Button(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    viewModel.setPredictionCompleted(false)
+                    navController.navigate(Screen.Home.name)
+                },
 //                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
                 modifier = Modifier
                     .padding(end = 19.dp, bottom = 24.dp, top = 24.dp)
@@ -272,6 +279,5 @@ fun PredictionResultsContent(
 fun PredictionResultsScreenPreview() {
     PredictionResultsContent(
         viewModel = viewModel(),
-        isPredictionPositive = true,
     )
 }

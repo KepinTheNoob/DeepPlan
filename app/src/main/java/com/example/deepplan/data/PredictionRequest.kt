@@ -2,10 +2,14 @@ package com.example.deepplan.data
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.deepplan.BuildConfig
 import com.example.deepplan.ui.screen.newProject.NewProjectViewModel
+import com.google.ai.client.generativeai.GenerativeModel
 import com.google.gson.Gson
 import com.google.gson.JsonParser
+import kotlinx.coroutines.launch
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaType
@@ -39,8 +43,7 @@ class Predictor {
         jumlah_sdm_inti: Int,
         persentase_subkontraktor: Float,
         newProjectViewModel: NewProjectViewModel = NewProjectViewModel(),
-
-        ) {
+    ) {
         val client = OkHttpClient()
         val mediaType = "application/json".toMediaType()
         val jsonBody = Gson().toJson(

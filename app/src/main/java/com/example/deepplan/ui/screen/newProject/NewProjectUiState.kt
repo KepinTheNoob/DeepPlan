@@ -33,9 +33,11 @@ data class NewProjectUiState (
 
     // Prediction Results
     val predictionCompleted: Boolean = false,
+    val goodPrediction: Boolean = true,
     val biaya_akhir_riil_miliar_rp: Double = 0.0,
     val durasi_akhir_riil_hari: Double = 0.0,
     val profit_margin_riil_persen: Double = 0.0,
     val terjadi_keterlambatan_signifikan: String = "No",
     val terjadi_pembengkakan_biaya_signifikan: String = "No",
+    val reason: String = "",
 )

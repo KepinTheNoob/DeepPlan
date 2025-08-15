@@ -124,7 +124,8 @@ fun MainContent(
 
         composable(Screen.Prediction.name) {
             PredictionResultsScreen(
-                viewModel = newProjectViewModel
+                viewModel = newProjectViewModel,
+                navController = navController
             )
         }
     }
