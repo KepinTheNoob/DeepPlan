@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,6 +29,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.deepplan.data.Screen
 import com.example.deepplan.ui.screen.home.Home
+import com.example.deepplan.ui.screen.manageProject.ManageProjectScreen
 import com.example.deepplan.ui.screen.newProject.ExternalContextScreen
 import com.example.deepplan.ui.screen.newProject.GeneralInformationScreen
 import com.example.deepplan.ui.screen.newProject.InternalFactorsScreen
@@ -70,6 +72,20 @@ fun MainScreenBar(
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                    )
+                }
+            } else if (currentScreen in listOf<Screen>(
+                    Screen.ManageProject
+            )) {
+                IconButton (
+                    onClick = {},
+                    colors = IconButtonDefaults.iconButtonColors(
+                        contentColor = MaterialTheme.colorScheme.surface
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Menu,
                         contentDescription = "Back",
                     )
                 }
@@ -128,6 +144,10 @@ fun MainContent(
                 navController = navController
             )
         }
+
+        composable(Screen.ManageProject.name) {
+            ManageProjectScreen()
+        }
     }
 }
 
@@ -140,7 +160,7 @@ fun MainScreen(
     val currentScreen = Screen.valueOf(
         backStackEntry?.destination?.route ?: Screen.Home.name
     )
-    var startScreen by remember { mutableStateOf<Screen>(Screen.NewProjectInternalFactors) }
+    var startScreen by remember { mutableStateOf<Screen>(Screen.ManageProject) }
 
     when (currentScreen) {
         Screen.Home -> {

@@ -24,8 +24,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.deepplan.ui.theme.Typography
 import com.example.deepplan.R
+import com.example.deepplan.data.Screen
 
 val Typography = Typography(
     displaySmall = TextStyle(
@@ -58,7 +61,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            Homepage()
+            ManageProjectScreen()
         }
     }
 }
@@ -66,7 +69,9 @@ class MainActivity : ComponentActivity() {
 data class Project(val name: String, val progress: Float)
 
 @Composable
-fun Homepage() {
+fun ManageProjectScreen(
+    navController: NavHostController = rememberNavController(),
+) {
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
@@ -81,25 +86,25 @@ fun Homepage() {
                     .weight(0.4f) // Takes up a portion of the screen height
                     .background(MaterialTheme.colorScheme.primary)
             ) {
-                // Top app bar with icons
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Menu,
-                        contentDescription = "Menu",
-                        tint = MaterialTheme.colorScheme.onPrimary
-                    )
-//                    Image(
-//                        painter = painterResource(id = com.example.deepplan.R.drawable.avatar), // Use your image name here
-//                        contentDescription = "User Profile",
-//                        modifier = Modifier.size(24.dp), // Set the desired size for the image
+//                // Top app bar with icons
+//                Row(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(16.dp),
+//                    horizontalArrangement = Arrangement.SpaceBetween,
+//                    verticalAlignment = Alignment.CenterVertically
+//                ) {
+//                    Icon(
+//                        imageVector = Icons.Default.Menu,
+//                        contentDescription = "Menu",
+//                        tint = MaterialTheme.colorScheme.onPrimary
 //                    )
-                }
+////                    Image(
+////                        painter = painterResource(id = com.example.deepplan.R.drawable.avatar), // Use your image name here
+////                        contentDescription = "User Profile",
+////                        modifier = Modifier.size(24.dp), // Set the desired size for the image
+////                    )
+//                }
 
                 Text(
                     text = "Welcome to\nDeepPlan",
@@ -156,7 +161,9 @@ fun Homepage() {
 
                 // "Add New Project" button
                 Button(
-                    onClick = { /* Handle button click */ },
+                    onClick = {
+                        navController.navigate(Screen.NewProjectGeneralInformation.name)
+                    },
                     modifier = Modifier
                         .align(Alignment.End) // Posisikan di kanan bawah
                         .padding(bottom = 16.dp), // Tambahkan padding untuk jarak dari tepi
@@ -241,5 +248,5 @@ fun ProjectCard(project: Project) {
 @Preview(showBackground = true)
 @Composable
 fun HomepagePreview() {
-    Homepage()
+    ManageProjectScreen()
 }
