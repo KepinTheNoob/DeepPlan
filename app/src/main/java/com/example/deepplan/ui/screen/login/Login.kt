@@ -52,6 +52,7 @@ import com.example.deepplan.ui.theme.DeepPlanTheme
 import kotlin.math.round
 import com.example.deepplan.R
 import com.example.deepplan.ui.screen.home.CheckList
+import com.example.deepplan.data.Screen
 
 @Composable
 fun Login(navController: NavHostController, authViewModel: AuthViewModel) {
