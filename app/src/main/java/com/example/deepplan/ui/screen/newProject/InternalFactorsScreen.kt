@@ -1,5 +1,6 @@
 package com.example.deepplan.ui.screen.newProject
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -44,6 +45,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.deepplan.ui.theme.Typography
 import com.example.deepplan.R
 import com.example.deepplan.data.Screen
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -255,7 +258,10 @@ fun InternalFactorsScreen(
                 }
             }
             Button(
-                onClick = { /* TODO */ },
+                onClick = {
+                    viewModel.doPrediction()
+                    navController.navigate(Screen.Prediction.name)
+                },
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.onPrimaryContainer)
             ) {
                 Row(

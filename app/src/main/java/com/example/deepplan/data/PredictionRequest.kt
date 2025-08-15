@@ -1,6 +1,7 @@
 package com.example.deepplan.data
 
 import android.util.Log
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.deepplan.ui.screen.newProject.NewProjectViewModel
 import com.google.gson.Gson
@@ -16,29 +17,30 @@ import java.io.IOException
 
 class Predictor {
     fun predictionRequest(
-        newProjectViewModel: NewProjectViewModel,
         project_type: String,
         client_type: String,
         contract_type: String,
         is_design_and_build: Int,
-        nilai_kontrak_awal_miliar_rp: Double,
-        total_jam_kerja_estimasi: Int,
-        volume_pekerjaan_tanah_m3: Int,
-        volume_beton_m3: Int,
-        berat_baja_struktural_ton: Int,
-        panjang_instalasi_utama_km: Int,
+        nilai_kontrak_awal_miliar_rp: Float,
+        total_jam_kerja_estimasi: Float,
+        volume_pekerjaan_tanah_m3: Float,
+        volume_beton_m3: Float,
+        berat_baja_struktural_ton: Float,
+        panjang_instalasi_utama_km: Float,
         jumlah_titik_akhir_instalasi: Int,
         jumlah_item_pekerjaan_utama: Int,
         tingkat_risiko_geoteknik: Int,
         lokasi_provinsi: String,
         lokasi_urban_rural: String,
         musim_pelaksanaan: String,
-        indeks_harga_komoditas_saat_mulai: Double,
+        indeks_harga_komoditas_saat_mulai: Float,
         jumlah_kompetitor_saat_tender: Int,
         pengalaman_pm_tahun: Int,
         jumlah_sdm_inti: Int,
-        persentase_subkontraktor: Int
-    ) {
+        persentase_subkontraktor: Float,
+        newProjectViewModel: NewProjectViewModel = NewProjectViewModel(),
+
+        ) {
         val client = OkHttpClient()
         val mediaType = "application/json".toMediaType()
         val jsonBody = Gson().toJson(
@@ -74,6 +76,7 @@ class Predictor {
             .post(requestBody)
             .build()
 
+
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 Log.e("Predictor", "Request failed: ${e.message}")
@@ -92,12 +95,16 @@ class Predictor {
                         "terjadi_pembengkakan_biaya_signifikan" to jsonObject.getAsJsonArray("terjadi_pembengkakan_biaya_signifikan")[0].asInt,
                     )
 
+                    Log.d("Loading Prediction", body.get("durasi_akhir_riil_hari").toString())
+                    Log.d("Loading Prediction", "predictionRequest() sedang setPrediction()")
+                    Log.d("Loading Prediction", "predictionRequest() selesai")
+                    newProjectViewModel.setPrediction(body)
+
                 } else {
                     Log.e("Predictor", "Request failed with code: ${response.code}")
                 }
             }
 
         })
-
     }
 }

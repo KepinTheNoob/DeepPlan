@@ -1,6 +1,5 @@
 package com.example.deepplan
 
-import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -33,6 +32,8 @@ import com.example.deepplan.ui.screen.newProject.ExternalContextScreen
 import com.example.deepplan.ui.screen.newProject.GeneralInformationScreen
 import com.example.deepplan.ui.screen.newProject.InternalFactorsScreen
 import com.example.deepplan.ui.screen.newProject.NewProjectViewModel
+import com.example.deepplan.ui.screen.newProject.PredictionResultsContent
+import com.example.deepplan.ui.screen.newProject.PredictionResultsScreen
 import com.example.deepplan.ui.screen.newProject.TechnicalScopeScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -120,6 +121,12 @@ fun MainContent(
                 navController = navController,
             )
         }
+
+        composable(Screen.Prediction.name) {
+            PredictionResultsScreen(
+                viewModel = newProjectViewModel
+            )
+        }
     }
 }
 
@@ -132,7 +139,7 @@ fun MainScreen(
     val currentScreen = Screen.valueOf(
         backStackEntry?.destination?.route ?: Screen.Home.name
     )
-    var startScreen by remember { mutableStateOf<Screen>(Screen.Home) }
+    var startScreen by remember { mutableStateOf<Screen>(Screen.NewProjectInternalFactors) }
 
     when (currentScreen) {
         Screen.Home -> {
