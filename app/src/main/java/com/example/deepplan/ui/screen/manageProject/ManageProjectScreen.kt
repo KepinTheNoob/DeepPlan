@@ -28,6 +28,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.deepplan.ui.theme.Typography
 import com.example.deepplan.R
+import com.example.deepplan.data.Project
 import com.example.deepplan.data.Screen
 
 val Typography = Typography(
@@ -65,8 +66,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-data class Project(val name: String, val progress: Float)
 
 @Composable
 fun ManageProjectScreen(
