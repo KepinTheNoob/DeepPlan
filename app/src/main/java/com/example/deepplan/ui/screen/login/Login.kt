@@ -47,7 +47,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.deepplan.AuthState
 import com.example.deepplan.AuthViewModel
-import com.example.deepplan.ui.screen.Screen
 import com.example.deepplan.ui.theme.DeepPlanTheme
 import kotlin.math.round
 import com.example.deepplan.R
