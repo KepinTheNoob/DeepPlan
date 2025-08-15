@@ -1,6 +1,5 @@
 package com.example.deepplan.ui.screen.login
 
-import android.widget.Space
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -41,16 +40,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.deepplan.AuthState
 import com.example.deepplan.AuthViewModel
-import com.example.deepplan.ui.theme.DeepPlanTheme
-import kotlin.math.round
 import com.example.deepplan.R
-import com.example.deepplan.ui.screen.home.CheckList
 import com.example.deepplan.data.Screen
 
 @Composable
@@ -154,7 +149,6 @@ fun Login(navController: NavHostController, authViewModel: AuthViewModel) {
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(45.dp)
                         .padding(top = 5.dp),
                     shape = RoundedCornerShape(15.dp)
                 )
@@ -185,7 +179,6 @@ fun Login(navController: NavHostController, authViewModel: AuthViewModel) {
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(45.dp)
                         .padding(top = 5.dp),
                     shape = RoundedCornerShape(15.dp)
                 )

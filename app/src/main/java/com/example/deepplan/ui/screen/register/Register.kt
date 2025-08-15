@@ -37,14 +37,13 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.deepplan.AuthState
 import com.example.deepplan.AuthViewModel
 import com.example.deepplan.R
-import com.example.deepplan.ui.screen.Screen
+import com.example.deepplan.data.Screen
 
 @Composable
 fun Register(authViewModel: AuthViewModel, navController: NavController) {
