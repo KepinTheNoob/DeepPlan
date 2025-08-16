@@ -39,7 +39,7 @@ import androidx.compose.runtime.setValue
 
 @Preview(showBackground = true)
 @Composable
-fun profile() {
+fun ProfileScreen() {
     val auth = FirebaseAuth.getInstance()
     val db = FirebaseFirestore.getInstance()
     val userId = auth.currentUser?.uid
