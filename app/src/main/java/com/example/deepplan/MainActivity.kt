@@ -20,45 +20,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             DeepPlanTheme {
-                MainScreen()
+                MainScreen(this)
             }
         }
     }
 }
-
-@Composable
-fun MainContent(
-    authViewModel: AuthViewModel = AuthViewModel(),
-) {
-    val navController = rememberNavController()
-
-    NavHost(
-        navController = navController,
-        startDestination = Screen.Register.name
-    ) {
-        composable(Screen.Home.name) {
-            Home()
-        }
-        composable(Screen.Login.name) {
-            Login(
-                navController = navController,
-                authViewModel = authViewModel
-            )
-        }
-        composable(Screen.Register.name) {
-            Register(
-                navController = navController,
-                authViewModel = authViewModel
-            )
-        }
-    }
-}
-
-//@Preview(showBackground = true)
-//@Composable
-//fun GreetingPreview() {
-//    DeepPlanTheme {
-//        MainContent()
-//    }
-//}
-//}

@@ -1,5 +1,8 @@
 package com.example.deepplan
 
+import android.content.Context
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -22,17 +25,20 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -180,15 +186,29 @@ fun MainContent(
 
 @Composable
 fun MainScreen(
+    context: Context,
     newProjectViewModel: NewProjectViewModel = viewModel(),
     authViewModel: AuthViewModel = viewModel(),
 ) {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = Screen.valueOf(
-        backStackEntry?.destination?.route ?: Screen.Home.name
+        backStackEntry?.destination?.route ?: Screen.ManageProject.name
     )
     var startScreen by remember { mutableStateOf<Screen>(Screen.ManageProject) }
+
+    // Authentification
+    val authState = authViewModel.authState.observeAsState()
+
+    LaunchedEffect(authState.value) {
+        Log.d("Auth", authState.value.toString())
+        when(authState.value) {
+            is AuthState.Authenticated -> startScreen = Screen.ManageProject
+            is AuthState.Error -> Toast.makeText(context,
+                (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT).show()
+            else -> startScreen = Screen.Login
+        }
+    }
 
     // Drawer
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -290,17 +310,7 @@ fun MainScreen(
         }
 
         else -> {
-            Scaffold(
-                topBar = {
-                    MainScreenBar(
-                        currentScreen = currentScreen,
-                        canNavigateBack = navController.previousBackStackEntry != null,
-                        navigateUp = { navController.navigateUp() },
-                        navController = navController,
-                        onMenuClicked = {/*TODO*/},
-                    )
-                }
-            ) { innerPadding ->
+            Scaffold() { innerPadding ->
                 MainContent(
                     startScreen = startScreen,
                     navController = navController,

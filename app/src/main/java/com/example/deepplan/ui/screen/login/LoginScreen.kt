@@ -141,6 +141,7 @@ fun Login(navController: NavHostController, authViewModel: AuthViewModel) {
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
+                    singleLine = true,
                     isError = emailError.isNotEmpty(),
                     label = {
                         if (emailError.isNotEmpty()) {
@@ -167,8 +168,8 @@ fun Login(navController: NavHostController, authViewModel: AuthViewModel) {
                 )
 
                 OutlinedTextField(
-                    value = username,
-                    onValueChange = { username = it },
+                    value = password,
+                    onValueChange = { password = it },
                     label = {
                         Text(
                             text = "Enter your password here",
