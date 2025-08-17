@@ -55,17 +55,42 @@ fun Login(navController: NavHostController, authViewModel: AuthViewModel) {
     var password by remember { mutableStateOf("") }
     var emailError by remember { mutableStateOf("") }
     var passwordError by remember { mutableStateOf("") }
+    var hasNavigated by remember { mutableStateOf(false) }
 
     val authState = authViewModel.authState.observeAsState()
     val context = LocalContext.current
 
+//    LaunchedEffect(authState.value) {
+//        when(authState.value) {
+//            is AuthState.Authenticated -> navController.navigate(Screen.Home.name) {
+//                popUpTo(Screen.Login.name) { inclusive = true }
+//            }
+//            is AuthState.Error -> Toast.makeText(context,
+//                (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT).show()
+//            else -> Unit
+//        }
+//    }
+
     LaunchedEffect(authState.value) {
-        when(authState.value) {
-            is AuthState.Authenticated -> navController.navigate(Screen.Home.name) {
-                popUpTo(Screen.Login.name) { inclusive = true }
+        when (authState.value) {
+            is AuthState.Authenticated -> {
+                if (!hasNavigated) {
+                    hasNavigated = true
+                    navController.navigate(Screen.Home.name) {
+                        popUpTo(Screen.Login.name) { inclusive = true }
+                    }
+                }
             }
-            is AuthState.Error -> Toast.makeText(context,
-                (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT).show()
+            is AuthState.Unauthenticated -> {
+                hasNavigated = false
+            }
+            is AuthState.Error -> {
+                Toast.makeText(
+                    context,
+                    (authState.value as AuthState.Error).message,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
             else -> Unit
         }
     }

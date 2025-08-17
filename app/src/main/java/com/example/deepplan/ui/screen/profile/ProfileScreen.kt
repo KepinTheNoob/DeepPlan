@@ -1,5 +1,6 @@
 package com.example.deepplan.ui.screen.profile
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,9 +15,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -35,33 +40,29 @@ import com.example.deepplan.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import com.example.deepplan.AuthState
+import com.example.deepplan.AuthViewModel
+import com.example.deepplan.data.Screen
+import com.example.deepplan.ui.theme.DeepPlanTheme
+import java.util.concurrent.BlockingDeque
+import kotlin.math.round
 
-@Preview(showBackground = true)
 @Composable
-fun ProfileScreen() {
-    val auth = FirebaseAuth.getInstance()
-    val db = FirebaseFirestore.getInstance()
-    val userId = auth.currentUser?.uid
-
-    var username by remember { mutableStateOf(TextFieldValue("")) }
-    var email by remember { mutableStateOf(TextFieldValue("")) }
-
-    LaunchedEffect(userId) {
-        if(userId != null) {
-            db.collection("users").document(userId)
-                .get()
-                .addOnSuccessListener { document ->
-                    if(document.exists()) {
-                        username = TextFieldValue(document.getString("username") ?: "")
-                        email = TextFieldValue(document.getString("email") ?: "")
-                    }
-                }
-        }
-    }
-
+fun ProfileUI(
+    username: String,
+    email: String,
+    onUsernameChange: (String) -> Unit,
+    onEmailChange: (String) -> Unit,
+    authViewModel: AuthViewModel,
+    onSignOut: () -> Unit
+) {
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
     ) {
         Column(
             modifier = Modifier
@@ -110,7 +111,11 @@ fun ProfileScreen() {
             }
         }
 
-        Column {
+        Column (
+            modifier = Modifier
+                .padding(vertical = 29.dp, horizontal = 33.dp)
+                .fillMaxWidth()
+        ) {
             Text(
                 text = "Username",
                 style = TextStyle(
@@ -120,11 +125,21 @@ fun ProfileScreen() {
                 )
             )
 
+            Spacer(modifier = Modifier.height(7.dp))
+
             OutlinedTextField(
                 value = username,
-                onValueChange = { username = it },
-                singleLine = true
+                onValueChange = { onUsernameChange(it) },
+                singleLine = true,
+                shape = RoundedCornerShape(20.dp),
+                modifier = Modifier.fillMaxWidth().background(Color(0xFFEFEFEF)),
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedBorderColor = MaterialTheme.colorScheme.surfaceTint,
+                    focusedBorderColor = MaterialTheme.colorScheme.surfaceTint
+                )
             )
+
+            Spacer(modifier = Modifier.height(13.dp))
 
             Text(
                 text = "Email",
@@ -135,12 +150,94 @@ fun ProfileScreen() {
                 )
             )
 
+            Spacer(modifier = Modifier.height(7.dp))
+
             OutlinedTextField(
                 value = email,
-                onValueChange = { email = it },
-                singleLine = true
+                onValueChange = { onEmailChange(it) },
+                singleLine = true,
+                shape = RoundedCornerShape(20.dp),
+                modifier = Modifier.fillMaxWidth().background(Color(0xFFEFEFEF)),
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedBorderColor = MaterialTheme.colorScheme.surfaceTint,
+                    focusedBorderColor = MaterialTheme.colorScheme.surfaceTint
+                )
             )
+
+            Spacer(modifier = Modifier.weight(.1f))
+
+            Button(
+                onClick = {
+                    authViewModel.signout()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent,
+                    contentColor = Color(0xFFB3261E)
+                ),
+                border = BorderStroke(1.dp, Color(0xFFFF0000)),
+                elevation = ButtonDefaults.buttonElevation(0.dp),
+                shape = RoundedCornerShape(5.dp)
+            ) {
+                Text(
+                    text = "Sign Out of Account",
+                    style = TextStyle(
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                )
+            }
         }
     }
 }
 
+@Composable
+fun ProfileScreen(
+    navController: NavHostController,
+            authViewModel: AuthViewModel = viewModel()
+) {
+    val auth = FirebaseAuth.getInstance()
+    val db = FirebaseFirestore.getInstance()
+    val userId = auth.currentUser?.uid
+    val authViewModel: AuthViewModel = viewModel()
+    val authState by authViewModel.authState.observeAsState()
+
+    var username by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+
+    LaunchedEffect(authState) {
+        if (authState is AuthState.Unauthenticated) {
+            navController.navigate(Screen.Login.name) {
+                popUpTo(0) { inclusive = true }
+                launchSingleTop = true
+            }
+        }
+    }
+
+    if (authState is AuthState.Authenticated) {
+        ProfileUI(
+            username = username,
+            email = email,
+            onUsernameChange = { username = it },
+            onEmailChange = { email = it },
+            authViewModel = authViewModel,
+            onSignOut = {
+                authViewModel.signout()
+                navController.navigate(Screen.Login.name) {
+                    popUpTo(0)
+                }
+            }
+        )
+    }
+}
+
+//@Preview(showBackground = true)
+//@Composable
+//fun reeee() {
+//    DeepPlanTheme {
+//        Profile(
+//            "Jefferson Darren Cendres",
+//            "jefferson@example.com",
+//            onUsernameChange = {},
+//            onEmailChange = {})
+//    }
+//}
