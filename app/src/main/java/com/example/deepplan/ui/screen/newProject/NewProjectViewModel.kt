@@ -7,6 +7,9 @@ import com.example.deepplan.BuildConfig
 import com.example.deepplan.data.Predictor
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.ServerException
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -160,6 +163,8 @@ class NewProjectViewModel: ViewModel() {
         Log.d("Loading Prediction", "biaya akhir: ${uiState.value.biaya_akhir_riil_miliar_rp.toString()}")
         Log.d("Loading Prediction", "setPrediction() prediction complete: ${uiState.value.predictionCompleted.toString()}")
 
+        savePredictionResults()
+
         generatePredictionReason()
     }
 
@@ -235,5 +240,51 @@ class NewProjectViewModel: ViewModel() {
                 }
             }
         }
+    }
+
+    fun savePredictionResults() {
+        val db = Firebase.firestore
+        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
+
+        val predictionResults = hashMapOf(
+            "user_id" to currentUserId,
+            "progress" to 0.0,
+            "project_name" to uiState.value.projectName,
+            "project_type" to uiState.value.projectType,
+            "client_type" to uiState.value.clientType,
+            "contract_type" to uiState.value.contractType,
+            "is_design_and_build" to uiState.value.isItDesignAndBuild,
+            "nilai_kontrak_awal_miliar_rp" to uiState.value.initialContractValue,
+            "total_jam_kerja_estimasi" to uiState.value.estimatedTotalManHours,
+            "volume_pekerjaan_tanah_m3" to uiState.value.earthworkVolume,
+            "volume_beton_m3" to uiState.value.concreteVolume,
+            "berat_baja_struktural_ton" to uiState.value.structuralSteelWeight,
+            "panjang_instalasi_utama_km" to uiState.value.mainInstallationLength,
+            "jumlah_titik_akhir_instalasi" to uiState.value.numberOfInstallationEndpoint,
+            "jumlah_item_pekerjaan_utama" to uiState.value.numberOfMainTasks,
+            "tingkat_risiko_geoteknik" to uiState.value.geotechnicalRiskLevel,
+            "lokasi_provinsi" to uiState.value.location,
+            "lokasi_urban_rural" to uiState.value.areaType,
+            "musim_pelaksanaan" to uiState.value.season,
+            "indeks_harga_komoditas_saat_mulai" to uiState.value.commodityPriceIndex,
+            "jumlah_kompetitor_saat_tender" to uiState.value.numberOfTenderCompetitor,
+            "pengalaman_pm_tahun" to uiState.value.projectManagerExperienceYears,
+            "jumlah_sdm_inti" to uiState.value.coreTeamSize,
+            "persentase_subkontraktor" to uiState.value.subcontractorPercentage,
+            "biaya_akhir_riil_miliar_rp" to uiState.value.biaya_akhir_riil_miliar_rp,
+            "durasi_akhir_riil_hari" to uiState.value.durasi_akhir_riil_hari,
+            "profit_margin_riil_persen" to uiState.value.profit_margin_riil_persen,
+            "terjadi_keterlambatan_signifikan" to uiState.value.terjadi_keterlambatan_signifikan,
+            "terjadi_pembengkakan_biaya_signifikan" to uiState.value.terjadi_pembengkakan_biaya_signifikan,
+            )
+
+        db.collection("projects")
+            .add(predictionResults)
+            .addOnSuccessListener { documentReference ->
+                Log.d("Loading Prediction", "DocumentSnapshot added with ID: ${documentReference.id}")
+            }
+            .addOnFailureListener { e ->
+                Log.w("Loading Prediction", "Error adding document: ${e}")
+            }
     }
 }

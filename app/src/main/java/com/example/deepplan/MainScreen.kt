@@ -46,6 +46,7 @@ import com.example.deepplan.data.Screen
 import com.example.deepplan.ui.screen.home.Home
 import com.example.deepplan.ui.screen.login.Login
 import com.example.deepplan.ui.screen.manageProject.ManageProjectScreen
+import com.example.deepplan.ui.screen.manageProject.ManageProjectViewModel
 import com.example.deepplan.ui.screen.newProject.ExternalContextScreen
 import com.example.deepplan.ui.screen.newProject.GeneralInformationScreen
 import com.example.deepplan.ui.screen.newProject.InternalFactorsScreen
@@ -74,6 +75,7 @@ fun MainScreenBar(
         },
 
         navigationIcon = {
+            Log.d("Current Screen", currentScreen.toString())
             if (currentScreen in  listOf<Screen>(Screen.Home)) {
                 // Taro App Bar Home disini
             } else if (currentScreen in listOf<Screen>(
@@ -120,6 +122,7 @@ fun MainContent(
     innerPadding: PaddingValues,
     newProjectViewModel: NewProjectViewModel,
     authViewModel: AuthViewModel,
+    manageProjectViewModel: ManageProjectViewModel
 ) {
     NavHost(
         navController = navController,
@@ -177,7 +180,10 @@ fun MainContent(
         }
 
         composable(Screen.ManageProject.name) {
-            ManageProjectScreen()
+            ManageProjectScreen(
+                viewModel = manageProjectViewModel,
+                navController = navController
+            )
         }
 
 
@@ -189,6 +195,7 @@ fun MainScreen(
     context: Context,
     newProjectViewModel: NewProjectViewModel = viewModel(),
     authViewModel: AuthViewModel = viewModel(),
+    manageProjectViewModel: ManageProjectViewModel = viewModel()
 ) {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -232,7 +239,8 @@ fun MainScreen(
                     navController = navController,
                     innerPadding = innerPadding,
                     newProjectViewModel = newProjectViewModel,
-                    authViewModel = authViewModel
+                    authViewModel = authViewModel,
+                    manageProjectViewModel = manageProjectViewModel,
                 )
             }
         }
@@ -303,12 +311,38 @@ fun MainScreen(
                         navController = navController,
                         innerPadding = innerPadding,
                         newProjectViewModel = newProjectViewModel,
-                        authViewModel = authViewModel
+                        authViewModel = authViewModel,
+                        manageProjectViewModel = manageProjectViewModel,
                     )
                 }
             }
         }
 
+        Screen.NewProjectGeneralInformation,
+        Screen.NewProjectTechnicalScope,
+        Screen.NewProjectExternalContext,
+        Screen.NewProjectInternalFactors -> {
+            Scaffold(
+                topBar = {
+                    MainScreenBar(
+                        currentScreen = currentScreen,
+                        canNavigateBack = navController.previousBackStackEntry != null,
+                        navigateUp = { navController.navigateUp() },
+                        navController = navController,
+                        onMenuClicked = {}
+                    )
+                }
+            ) { innerPadding ->
+                MainContent(
+                    startScreen = startScreen,
+                    navController = navController,
+                    innerPadding = innerPadding,
+                    newProjectViewModel = newProjectViewModel,
+                    authViewModel = authViewModel,
+                    manageProjectViewModel = manageProjectViewModel,
+                )
+            }
+        }
         else -> {
             Scaffold() { innerPadding ->
                 MainContent(
@@ -316,7 +350,8 @@ fun MainScreen(
                     navController = navController,
                     innerPadding = innerPadding,
                     newProjectViewModel = newProjectViewModel,
-                    authViewModel = authViewModel
+                    authViewModel = authViewModel,
+                    manageProjectViewModel = manageProjectViewModel,
                 )
             }
         }

@@ -2,7 +2,7 @@ package com.example.deepplan.ui.screen.newProject
 
 data class NewProjectUiState (
     // General Information
-    val projectName: String = "asdasd",
+    val projectName: String = "IKN",
     val projectType: String = "Jalan Tol",
     val clientType: String = "BUMN",
     val contractType: String = "Lump Sum",
