@@ -1,20 +1,24 @@
-package com.example.deepplan.ui.screen.register
+package com.example.deepplan.ui.screen.login
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -35,40 +39,63 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.deepplan.AuthState
 import com.example.deepplan.AuthViewModel
 import com.example.deepplan.R
 import com.example.deepplan.data.Screen
 
 @Composable
-fun Register(authViewModel: AuthViewModel, navController: NavController) {
+fun Login(navController: NavHostController, authViewModel: AuthViewModel) {
     var email by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
     var emailError by remember { mutableStateOf("") }
     var passwordError by remember { mutableStateOf("") }
-    var confirmPasswordError by remember { mutableStateOf("") }
-    var usernameError by remember { mutableStateOf("") }
+    var hasNavigated by remember { mutableStateOf(false) }
 
     val authState = authViewModel.authState.observeAsState()
     val context = LocalContext.current
 
+//    LaunchedEffect(authState.value) {
+//        when(authState.value) {
+//            is AuthState.Authenticated -> navController.navigate(Screen.Home.name) {
+//                popUpTo(Screen.Login.name) { inclusive = true }
+//            }
+//            is AuthState.Error -> Toast.makeText(context,
+//                (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT).show()
+//            else -> Unit
+//        }
+//    }
+
     LaunchedEffect(authState.value) {
-        when(authState.value) {
-            is AuthState.Authenticated -> navController.navigate(Screen.Home.name) {
-                popUpTo(Screen.Register.name) { inclusive = true }
+        when (authState.value) {
+            is AuthState.Authenticated -> {
+                if (!hasNavigated) {
+                    hasNavigated = true
+                    navController.navigate(Screen.Home.name) {
+                        popUpTo(Screen.Login.name) { inclusive = true }
+                    }
+                }
             }
-            is AuthState.Error -> Toast.makeText(context,
-                (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT).show()
+            is AuthState.Unauthenticated -> {
+                hasNavigated = false
+            }
+            is AuthState.Error -> {
+                Toast.makeText(
+                    context,
+                    (authState.value as AuthState.Error).message,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
             else -> Unit
         }
     }
+
+    val checkedState = remember { mutableStateOf(true) }
 
     Box (
         modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceTint),
@@ -85,7 +112,8 @@ fun Register(authViewModel: AuthViewModel, navController: NavController) {
                 fontSize = 36.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primaryContainer,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                lineHeight = 39.sp
             )
         }
 
@@ -118,16 +146,16 @@ fun Register(authViewModel: AuthViewModel, navController: NavController) {
                 .fillMaxWidth()
                 .fillMaxHeight(0.623f)
                 .align(Alignment.BottomCenter)
-                .padding(end = 17.dp),
-            shape = RoundedCornerShape(topEnd = 100.dp),
+                .padding(start = 13.dp),
+            shape = RoundedCornerShape(topStart = 100.dp),
             color = Color.White,
             tonalElevation = 4.dp
         ) {
             Column (
-                modifier = Modifier.padding(start = 22.dp, top = 28.dp, end = 26.dp)
+                modifier = Modifier.padding(start = 38.dp, top = 53.dp, end = 24.dp)
             ) {
                 Text(
-                    text = "Email",
+                    text = "Username/email",
                     style = TextStyle(
                         color = MaterialTheme.colorScheme.surfaceTint,
                         fontWeight = FontWeight.Bold,
@@ -138,58 +166,21 @@ fun Register(authViewModel: AuthViewModel, navController: NavController) {
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
-                    isError = emailError.isNotEmpty(),
-                    placeholder = {
-                        Text(
-                            text = "examplemail@gmail.com",
-                            style = TextStyle(
-                                fontSize = 11.sp,
-                                color = if(passwordError.isNotEmpty()) Color.Red else Color(0xFFCCCCCC)
-                            )
-                        )
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 5.dp),
-                    shape = RoundedCornerShape(20.dp),
                     singleLine = true,
-                    textStyle = TextStyle(fontSize = 11.sp),
-                )
-
-                Spacer(
-                    modifier = Modifier.height(16.dp)
-                )
-
-                Text(
-                    text = "Username",
-                    style = TextStyle(
-                        color = MaterialTheme.colorScheme.surfaceTint,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
-                    )
-                )
-
-                OutlinedTextField(
-                    value = username,
-                    onValueChange = { username = it },
-                    isError = usernameError.isNotEmpty(),
-                    placeholder = {
-                        Text(
-                            text = "Enter your username here",
-                            style = TextStyle(
-                                fontSize = 11.sp,
-                                color = if (usernameError.isNotEmpty()) Color.Red else Color(0xFFCCCCCC)
-                            )
-                        )
+                    isError = emailError.isNotEmpty(),
+                    label = {
+                        if (emailError.isNotEmpty()) {
+                            Text(emailError, color = Color.Red, fontSize = 11.sp)
+                        }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 5.dp),
-                    shape = RoundedCornerShape(20.dp)
+                    shape = RoundedCornerShape(15.dp)
                 )
 
                 Spacer(
-                    modifier = Modifier.height(16.dp)
+                    modifier = Modifier.height(24.dp)
                 )
 
                 Text(
@@ -204,7 +195,7 @@ fun Register(authViewModel: AuthViewModel, navController: NavController) {
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    placeholder = {
+                    label = {
                         Text(
                             text = "Enter your password here",
                             style = TextStyle(
@@ -212,43 +203,10 @@ fun Register(authViewModel: AuthViewModel, navController: NavController) {
                                 color = if(passwordError.isNotEmpty()) Color.Red else Color(0xFFCCCCCC))
                         )
                     },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 5.dp),
-                    shape = RoundedCornerShape(20.dp)
-                )
-
-                Spacer(
-                    modifier = Modifier.height(16.dp)
-                )
-
-                Text(
-                    text = "Confirm Password",
-                    style = TextStyle(
-                        color = MaterialTheme.colorScheme.surfaceTint,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
-                    )
-                )
-
-                OutlinedTextField(
-                    value = confirmPassword,
-                    onValueChange = { confirmPassword = it },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    placeholder = {
-                        Text(
-                            text = "Re-enter your password here",
-                            style = TextStyle(
-                                fontSize = 11.sp,
-                                color = if(passwordError.isNotEmpty()) Color.Red else Color(0xFFCCCCCC)
-                            )
-                        )
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 5.dp),
-                    shape = RoundedCornerShape(20.dp)
+                    shape = RoundedCornerShape(15.dp)
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -256,36 +214,23 @@ fun Register(authViewModel: AuthViewModel, navController: NavController) {
                 Button (
                     shape = RoundedCornerShape(10.dp),
                     onClick = {
-                        emailError =
-                            if(email.isBlank()) "Email is required!"
-                            else if(!email.contains("@")) "Email must contain '@'!"
-                            else ""
-                        passwordError =
-                            if(password.isBlank()) "Password is required!"
-                            else if(password.length < 8) "Password must have at least 8 characters!"
-                            else ""
-                        confirmPasswordError =
-                            if(confirmPassword.isBlank()) "Confirm is required!"
-                            else if(confirmPassword != password) "Must be same with password!"
-                            else ""
-                        usernameError =
-                            if (username.isBlank()) "Username is required!"
-                            else if (username.length < 3) "Username must be at least 3 characters!"
-                            else if (!username.matches(Regex("^[A-Za-z0-9_\\.]+$")))
-                                "Only letters, numbers, underscores, and dots are allowed!"
-                            else ""
-                        if(emailError.isEmpty() && passwordError.isEmpty() && confirmPasswordError.isEmpty()) {
-                            authViewModel.signup(email, password, username)
+                        emailError = if(email.isBlank()) "Email is required!" else ""
+                        passwordError = if(password.isBlank()) "Password is required!" else ""
+                        if(emailError.isEmpty() && passwordError.isEmpty()) {
+                            authViewModel.login(email, password)
                         }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(50.dp)
+                        .height(50.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                    )
                 ) {
                     Text(
-                        text = "Sign Up",
+                        text = "Sign In",
                         style = TextStyle(
-                            color = MaterialTheme.colorScheme.primaryContainer,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -301,7 +246,7 @@ fun Register(authViewModel: AuthViewModel, navController: NavController) {
                         .height(50.dp)
                 ) {
                     Text(
-                        text = "Sign Up with Google",
+                        text = "Sign In with Google",
                         style = TextStyle(
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
                             fontSize = 20.sp,
@@ -310,17 +255,52 @@ fun Register(authViewModel: AuthViewModel, navController: NavController) {
                     )
                 }
 
+                Spacer(modifier = Modifier.height(5.dp))
+
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier.size(24.dp)
+                        ) {
+                            Checkbox(
+                                checked = checkedState.value,
+                                onCheckedChange = { checkedState.value = it },
+                                modifier = Modifier.size(14.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(9.dp))
+
+                        Text(
+                            text = "Remember me",
+                            style = TextStyle(
+                                fontSize = 11.sp,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        )
+                    }
+
+                    Text(
+                        text = "Forgot password?",
+                        color = MaterialTheme.colorScheme.surfaceTint,
+                        style = TextStyle(
+                            fontSize = 11.sp
+                        )
+                    )
+                }
+
                 Spacer(modifier = Modifier.weight(.1f))
 
                 TextButton(
-                    onClick = {
-                        navController.navigate(Screen.Login.name)
-                    },
-                    enabled = authState.value != AuthState.Loading,
+                    onClick = { navController.navigate(Screen.Register.name) },
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 ) {
                     Text(
-                        text = "Already have an account? Sign In",
+                        text = "Don't have an account? Sign Up",
                         style = TextStyle(
                             color = MaterialTheme.colorScheme.primary,
                             fontSize = 13.sp,

@@ -8,5 +8,7 @@ enum class Screen(val title: String) {
     NewProjectTechnicalScope("New Project - Technical Scope"),
     NewProjectExternalContext("New Project - External Context"),
     NewProjectInternalFactors("New Project - Internal Factors"),
-    Prediction("Prediction")
+    Prediction("Prediction"),
+    ManageProject("Manage Project"),
+    Profile("Profile Screen")
 }
