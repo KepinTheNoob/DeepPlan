@@ -1,6 +1,5 @@
-package com.example.deepplan.ui.screen.home
+package com.example.deepplan.ui.screen.projectDashboardScreen
 
-import android.widget.Space
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
@@ -15,29 +14,23 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxColors
 import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RichTooltip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TooltipBox
-import androidx.compose.material3.TooltipDefaults
-import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -55,11 +48,46 @@ import com.example.deepplan.R
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.deepplan.ui.theme.DeepPlanTheme
 
-//@Preview(showBackground = false)
 @Composable
-fun Home() {
+fun ProjectDashboardScreen(
+    viewModel: ProjectDashboardViewModel,
+    navController: NavHostController = rememberNavController(),
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    var showDashboard by remember { mutableStateOf(true) }
+
+    LaunchedEffect(uiState.isFetchingDataCompleted) {
+        if (uiState.isFetchingDataCompleted) {
+            showDashboard = true
+        }
+    }
+
+    when {
+        !(uiState.isFetchingDataCompleted) -> {
+            CircularProgressIndicator()
+        }
+
+        showDashboard -> {
+            Home(
+                viewModel = viewModel,
+                navController = navController,
+            )
+        }
+    }
+
+}
+
+@Composable
+fun Home(
+    viewModel: ProjectDashboardViewModel,
+    navController: NavHostController = rememberNavController(),
+) {
+    val uiState by viewModel.uiState.collectAsState()
     var textBox by remember { mutableStateOf("") }
 
     Column (
@@ -72,30 +100,10 @@ fun Home() {
             modifier = Modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.primary)
-                .padding(top = 12.dp, start = 4.dp, end = 4.dp, bottom = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.leading_icon),
-                contentDescription = "My Local Image",
-//                modifier = Modifier.size(120.dp)
-            )
-
-            Image(
-                painter = painterResource(id = R.drawable.trailing_elements),
-                contentDescription = "My Local Image",
-//                modifier = Modifier.size(120.dp)
-            )
-        }
-
-        Row (
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.primary)
                 .padding(bottom = 40.dp, start = 23.dp, top = 6.dp)
         ) {
             Text(
-                text = "How's it going, Handsome Kevin?",
+                text = uiState.greetings,
                 style = TextStyle(
                     fontSize = 24.sp,
                     color = MaterialTheme.colorScheme.onPrimary,
@@ -469,6 +477,8 @@ fun CheckList() {
 @Composable
 fun HomePreview() {
     DeepPlanTheme { // wrap in your app theme
-        Home()
+        ProjectDashboardScreen(
+            viewModel()
+        )
     }
 }

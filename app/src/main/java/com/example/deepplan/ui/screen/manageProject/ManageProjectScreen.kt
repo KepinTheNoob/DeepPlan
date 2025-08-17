@@ -226,7 +226,8 @@ fun ProjectCard(project: Project) {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp)),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+        onClick = {}
     ) {
         Box(
             modifier = Modifier
