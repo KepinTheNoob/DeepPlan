@@ -193,12 +193,11 @@ fun ProfileUI(
 @Composable
 fun ProfileScreen(
     navController: NavHostController,
-            authViewModel: AuthViewModel = viewModel()
+    authViewModel: AuthViewModel
 ) {
     val auth = FirebaseAuth.getInstance()
     val db = FirebaseFirestore.getInstance()
     val userId = auth.currentUser?.uid
-    val authViewModel: AuthViewModel = viewModel()
     val authState by authViewModel.authState.observeAsState()
 
     var username by remember { mutableStateOf("") }
@@ -210,6 +209,20 @@ fun ProfileScreen(
                 popUpTo(0) { inclusive = true }
                 launchSingleTop = true
             }
+        }
+    }
+
+    LaunchedEffect(authState) {
+        if (authState is AuthState.Authenticated && userId != null) {
+            email = auth.currentUser?.email ?: ""
+
+            // Fetch username from Firestore
+            db.collection("users").document(userId).get()
+                .addOnSuccessListener { document ->
+                    if (document != null && document.exists()) {
+                        username = document.getString("username") ?: ""
+                    }
+                }
         }
     }
 
