@@ -282,6 +282,11 @@ class NewProjectViewModel: ViewModel() {
             .add(predictionResults)
             .addOnSuccessListener { documentReference ->
                 Log.d("Loading Prediction", "DocumentSnapshot added with ID: ${documentReference.id}")
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        savedProjectId = documentReference.id
+                    )
+                }
             }
             .addOnFailureListener { e ->
                 Log.w("Loading Prediction", "Error adding document: ${e}")

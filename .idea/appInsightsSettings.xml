@@ -1,26 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="AppInsightsSettings">
-    <option name="tabSettings">
-      <map>
-        <entry key="Firebase Crashlytics">
-          <value>
-            <InsightsFilterSettings>
-              <option name="connection">
-                <ConnectionSetting>
-                  <option name="appId" value="com.example.straverse" />
-                  <option name="mobileSdkAppId" value="1:339912206624:android:1864c56fe533288bd10f45" />
-                  <option name="projectId" value="deepplan-cfbe6" />
-                  <option name="projectNumber" value="339912206624" />
-                </ConnectionSetting>
-              </option>
-              <option name="signal" value="SIGNAL_UNSPECIFIED" />
-              <option name="timeIntervalDays" value="THIRTY_DAYS" />
-              <option name="visibilityType" value="ALL" />
-            </InsightsFilterSettings>
-          </value>
-        </entry>
-      </map>
-    </option>
+    <option name="selectedTabId" value="Android Vitals" />
   </component>
 </project>
