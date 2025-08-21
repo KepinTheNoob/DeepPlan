@@ -274,7 +274,7 @@ fun MainScreen(
     LaunchedEffect(authState.value) {
         Log.d("Auth", authState.value.toString())
         when(authState.value) {
-            is AuthState.Authenticated -> startScreen = Screen.Loading
+            is AuthState.Authenticated -> startScreen = Screen.ManageProject
             is AuthState.Error -> Toast.makeText(context,
                 (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT).show()
             else -> startScreen = Screen.Login
