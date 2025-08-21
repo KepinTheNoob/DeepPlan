@@ -59,6 +59,7 @@ import com.example.deepplan.ui.screen.newProject.InternalFactorsScreen
 import com.example.deepplan.ui.screen.newProject.NewProjectViewModel
 import com.example.deepplan.ui.screen.newProject.PredictionResultsScreen
 import com.example.deepplan.ui.screen.newProject.TechnicalScopeScreen
+import com.example.deepplan.ui.screen.predictionLoading.CookieMorphingAnimation
 import com.example.deepplan.ui.screen.profile.ProfileScreen
 import com.example.deepplan.ui.screen.projectDashboardScreen.ProjectDashboardScreen
 import com.example.deepplan.ui.screen.projectDashboardScreen.ProjectDashboardViewModel
@@ -243,6 +244,10 @@ fun MainContent(
             )
         }
 
+        // Temporary Pages
+        composable(Screen.Loading.name) {
+            CookieMorphingAnimation()
+        }
 
     }
 }
@@ -269,7 +274,7 @@ fun MainScreen(
     LaunchedEffect(authState.value) {
         Log.d("Auth", authState.value.toString())
         when(authState.value) {
-            is AuthState.Authenticated -> startScreen = Screen.ManageProject
+            is AuthState.Authenticated -> startScreen = Screen.Loading
             is AuthState.Error -> Toast.makeText(context,
                 (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT).show()
             else -> startScreen = Screen.Login
