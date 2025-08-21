@@ -1,6 +1,8 @@
 package com.example.deepplan.ui.screen.newProject
 
 data class NewProjectUiState (
+    val savedProjectId: String = "",
+
     // General Information
     val projectName: String = "IKN",
     val projectType: String = "Jalan Tol",

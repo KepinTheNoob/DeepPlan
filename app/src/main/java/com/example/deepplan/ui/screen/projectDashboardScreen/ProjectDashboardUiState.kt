@@ -1,8 +1,17 @@
 package com.example.deepplan.ui.screen.projectDashboardScreen
 
+import com.example.deepplan.data.Task
+
 data class ProjectDashboardUiState(
-    val isFetchingDataCompleted: Boolean = true,
+    val isFetchingDataCompleted: Boolean = false,
+    val isGeneratePlanningCompleted: Boolean = false,
+    val isButtonGeneratePlanningClicked: Boolean = false,
+    val isButtonRegeneratePlanningClicked: Boolean = false,
     val greetings: String = "",
+    val projectId: String = "",
+    val progress: Float = 0f,
+
+    val tasks: List<Task> = emptyList(),
 
     // General Information
     val projectName: String = "",

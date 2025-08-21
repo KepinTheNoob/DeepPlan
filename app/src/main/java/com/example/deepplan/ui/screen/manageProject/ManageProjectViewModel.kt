@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.deepplan.data.Project
+import com.example.deepplan.data.ProjectOverview
+import com.example.deepplan.data.ProjectUiState
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.firestore
@@ -20,39 +22,26 @@ class ManageProjectViewModel: ViewModel() {
     )
     val uiState: StateFlow<ManageProjectUiState> = _uiState.asStateFlow()
 
-    fun loadProjects() {
-        val db = Firebase.firestore
-        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
+    fun loadProjects(
+        projects: List<Project>
+    ) {
+        val projectsOverview = mutableListOf<ProjectOverview>()
 
-        var projects = emptyList<Project>()
+        Log.d("Loading Projects",  "Projects: " + projects)
 
-        viewModelScope.launch {
-            db.collection("projects")
-                .whereEqualTo("user_id", currentUserId)
-                .get()
-                .addOnSuccessListener { documents ->
-                    for (document in documents) {
-                        Log.d("Loading Projects", "${document.id} => ${document.data}")
-                        projects += Project(
-                            id = document.id,
-                            projectName = document.data.get("project_name").toString(),
-                            progress = document.data.get("progress").toString().toFloat()
-                        )
-                    }
-                }
-                .addOnFailureListener { exception ->
-                    Log.w("Loading Projects", "Error getting documents: ", exception)
-                }
-                .await()
-
-            _uiState.update { currentState ->
-                currentState.copy(
-                    finishedLoadingProjects = true,
-                    projects = projects
-                )
-            }
-            Log.d("Loading Projects", "Projects: ${_uiState.value.projects}")
+        for (project in projects) {
+            projectsOverview += ProjectOverview(
+                id = project.id,
+                name = project.projectName,
+                progress = project.progress
+            )
         }
 
+        _uiState.update { currentState ->
+            currentState.copy(
+                finishedLoadingProjects = true,
+                projects = projectsOverview
+            )
+        }
     }
 }

@@ -1,12 +1,12 @@
 package com.example.deepplan.ui.screen.projectDashboardScreen
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
@@ -46,37 +47,98 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.deepplan.R
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.deepplan.data.ProjectViewModel
 import com.example.deepplan.ui.theme.DeepPlanTheme
 
 @Composable
 fun ProjectDashboardScreen(
     viewModel: ProjectDashboardViewModel,
+    projectViewModel: ProjectViewModel,
     navController: NavHostController = rememberNavController(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    var showDashboard by remember { mutableStateOf(true) }
+    val projectUiState by projectViewModel.uiState.collectAsState()
+    var showDashboard by remember { mutableStateOf(false) }
+    var showPlan by remember { mutableStateOf(false) }
+
 
     LaunchedEffect(uiState.isFetchingDataCompleted) {
-        if (uiState.isFetchingDataCompleted) {
+        viewModel.initDashboard(
+            uiState.projectId,
+            projectUiState.projects,
+        )
+
+        Log.d("Loading Projects", "is fetching data compplete: ${uiState.isFetchingDataCompleted}")
+        Log.d("Loading Projects", "greetings: ${uiState.greetings}")
+        if (uiState.isFetchingDataCompleted && uiState.greetings != "") {
+            Log.d("Loading Projects", "${uiState.tasks}")
+            if (uiState.tasks.isNotEmpty()) {
+                showPlan = true
+            }
             showDashboard = true
         }
+
+    }
+
+    LaunchedEffect(uiState.isGeneratePlanningCompleted) {
+//        Log.d("ProjectDashboardScreen", "${uiState.tasks}")
+//        if (uiState.tasks.size > 0) {
+//            showPlan = true
+//        }
+
+        if (uiState.isGeneratePlanningCompleted) {
+            showPlan = true
+            Log.d("ProjectDashboardScreen", "Planning generated")
+        }
+
+    }
+
+    LaunchedEffect(uiState.isButtonRegeneratePlanningClicked) {
+        Log.d("Regenerate", "is button clicked: ${uiState.isButtonRegeneratePlanningClicked}")
+        if (uiState.isButtonRegeneratePlanningClicked) {
+            projectViewModel.updateProjectProgress(uiState.projectId, 0f)
+            Log.d("Regenerate", "Regenerate button clicked")
+            showPlan = false
+            showDashboard = false
+        }
+//        else {
+//            showPlan = true
+//            showDashboard = true
+//        }
     }
 
     when {
-        !(uiState.isFetchingDataCompleted) -> {
-            CircularProgressIndicator()
-        }
+        showPlan -> {
+            Log.d("Loading Projects", "masuk ke showPlan")
+            Log.d("Debug Loading", "masuk ke showPlan")
 
-        showDashboard -> {
+            Log.d("ProjectDashboardScreen", "Plan loaded")
             Home(
                 viewModel = viewModel,
+                projectViewModel = projectViewModel,
+                showPlan = true,
                 navController = navController,
             )
+        }
+
+        showDashboard && !showPlan -> {
+            Log.d("Loading Projects", "masuk ke showDashboard")
+            Log.d("Debug Loading", "masuk ke showDashboard")
+            Log.d("ProjectDashboardScreen", "Dashboard loaded")
+            Home(
+                viewModel = viewModel,
+                projectViewModel = projectViewModel,
+                showPlan = false,
+                navController = navController,
+            )
+        }
+
+        else -> {
+            CircularProgressIndicator()
         }
     }
 
@@ -85,6 +147,8 @@ fun ProjectDashboardScreen(
 @Composable
 fun Home(
     viewModel: ProjectDashboardViewModel,
+    projectViewModel: ProjectViewModel,
+    showPlan: Boolean,
     navController: NavHostController = rememberNavController(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -121,7 +185,7 @@ fun Home(
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)
             ) {
                 Text(
-                    text = "SMART Recycling",
+                    text = uiState.projectName,
                     style = TextStyle(
                         color = MaterialTheme.colorScheme.primary,
                         fontSize = 24.sp,
@@ -153,7 +217,7 @@ fun Home(
                         )
 
                         LinearProgressIndicator(
-                            progress = { 0.1f },
+                            progress = { uiState.progress },
                             modifier = Modifier.fillMaxWidth(),
                             color = MaterialTheme.colorScheme.primary,
                             trackColor = MaterialTheme.colorScheme.surfaceVariant
@@ -161,7 +225,7 @@ fun Home(
                         Spacer(Modifier.height(8.dp))
 
                         Text(
-                            text = "${(0.1f * 100).toInt()}%",
+                            text = "${(uiState.progress * 100).toInt()}%",
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.primary,
                             textAlign = TextAlign.End,
@@ -233,35 +297,26 @@ fun Home(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                ExpandableBox("General Information", "Project Name: SMART")
+                ExpandableBoxGeneralInformation(uiState)
+                ExpandableBoxTechnicalScope(uiState)
+                ExpandableBoxExternalContext(uiState)
+                ExpandableBoxInternalFactors(uiState)
+                ExpandableBoxPredictionResults(uiState)
 
-                ExpandableBox("Technical Scope", "Project Name: SMART")
+                Spacer(modifier = Modifier.height(30.dp))
 
-                ExpandableBox("External Context", "Project Name: SMART")
-
-                ExpandableBox("Internal Factors", "Project Name: SMART")
-
-                ExpandableBox("Prediction Results", "Project Name: SMART")
-
-                Spacer(modifier = Modifier.height(75.dp))
-
-
+                Log.d("ProjectDashboardScreen", "showPlan = " + showPlan.toString())
+                Log.d("ProjectDashboardScreen", "not empty = " + uiState.tasks.isNotEmpty().toString())
+                if (uiState.tasks.isEmpty() && !(uiState.isButtonGeneratePlanningClicked)) {
                     Column {
                         Text(
-                            text = "Gantt Chart",
+                            text = "Planning",
                             style = TextStyle(
                                 color = MaterialTheme.colorScheme.primary,
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.Bold
                             )
                         )
-
-                        Image(
-                            painter = painterResource(R.drawable.image_1),
-                            contentDescription = "image 1"
-                        )
-
-                        Spacer(modifier = Modifier.height(12.dp))
 
                         Text(
                             text = "Describe to us how do you want the planning to be laid out:"
@@ -273,63 +328,71 @@ fun Home(
                             value = textBox,
                             onValueChange = { textBox = it }
                         )
+                        Button(
+                            onClick = {
+                                viewModel.generateTasks(textBox)
+                            }
+                        ) {
+                            Text(text = "Generate Planning")
+                        }
                     }
+                } else if (!showPlan) {
+                    CircularProgressIndicator()
+                } else if (showPlan && uiState.tasks.isNotEmpty()) {
+                    GanttChartComposable(uiState.tasks)
 
+                    Spacer(modifier = Modifier.height(26.dp))
 
-                Spacer(modifier = Modifier.height(26.dp))
-
-                Card (
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column (
-                        modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 18.dp, end = 20.dp)
+                    Card (
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text(
-                            text = "To-do list",
-                            style = TextStyle(
-                                color = MaterialTheme.colorScheme.onSurface,
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold
+                        Column (
+                            modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 18.dp, end = 20.dp)
+                        ) {
+                            Text(
+                                text = "To-do list",
+                                style = TextStyle(
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
                             )
-                        )
 
-                        Spacer(modifier = Modifier.height(22.dp))
+                            Spacer(modifier = Modifier.height(22.dp))
 
-                        Text(
-                            text = "A dialog is a type of modal window that appears in front of app content to provide critical information, or prompt for a decision to be made."
-                        )
+                            Text(
+                                text = "A dialog is a type of modal window that appears in front of app content to provide critical information, or prompt for a decision to be made."
+                            )
 
-                        Spacer(modifier = Modifier.height(40.dp))
+                            Spacer(modifier = Modifier.height(40.dp))
 
-                        CheckList()
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(55.dp))
-
-                Column (
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .background(Color(0xFFD9D9D9))
-                            .padding(vertical = 11.dp, horizontal = 45.dp)
-                            .clickable {  }
-                    ) {
-                        Text(
-                            text = "Edit Information"
-                        )
+                            CheckList(
+                                viewModel = viewModel,
+                                projectViewModel = projectViewModel,
+                            )
+                        }
                     }
 
-                    Spacer(modifier = Modifier.height(9.dp))
+                    Spacer(modifier = Modifier.height(55.dp))
 
                     Text(
-                        text = "Warning: This will redo the prediction once and will overwrite current information, but you can still rollback to this version",
-                        style = TextStyle(
-                            fontSize = 13.sp
-                        )
+                        text = "Describe to us how do you want the planning to be laid out:"
                     )
+
+                    Spacer(modifier = Modifier.height(11.dp))
+
+                    TextField(
+                        value = textBox,
+                        onValueChange = { textBox = it }
+                    )
+                    Button(
+                        onClick = {
+                            viewModel.generateTasks(textBox, true)
+                        }
+                    ) {
+                        Text(text = "Regenerate Planning")
+                    }
+
                 }
             }
         }
@@ -337,7 +400,9 @@ fun Home(
 }
 
 @Composable
-fun ExpandableBox(text: String, desc: String) {
+fun ExpandableBoxGeneralInformation(
+    uiState: ProjectDashboardUiState
+) {
     var expanded by remember { mutableStateOf(false) }
 
     // Animate arrow rotation
@@ -361,7 +426,7 @@ fun ExpandableBox(text: String, desc: String) {
             Spacer(modifier = Modifier.width(13.dp))
 
             Text(
-                text = text,
+                text = "General Information",
                 style = TextStyle(
                     color = MaterialTheme.colorScheme.primary,
                     fontSize = 24.sp,
@@ -374,7 +439,312 @@ fun ExpandableBox(text: String, desc: String) {
         AnimatedVisibility(visible = expanded) {
             Column(modifier = Modifier.padding(start = 37.dp, top = 8.dp)) {
                 Text(
-                    text = desc,
+                    text = "Project Name: ${uiState.projectName}",
+                    fontSize = 14.sp,
+                    color = Color.DarkGray
+                )
+                Text(
+                    text = "Project Type: ${uiState.projectType}",
+                    fontSize = 14.sp,
+                    color = Color.DarkGray
+                )
+                Text(
+                    text = "Client Type: ${uiState.clientType}",
+                    fontSize = 14.sp,
+                    color = Color.DarkGray
+                )
+                Text(
+                    text = "Contract Type: ${uiState.contractType}",
+                    fontSize = 14.sp,
+                    color = Color.DarkGray
+                )
+                Text(
+                    text = "Is It Design And Build: ${uiState.isItDesignAndBuild}",
+                    fontSize = 14.sp,
+                    color = Color.DarkGray
+                )
+                Text(
+                    text = "Number Of Main Tasks: ${uiState.numberOfMainTasks}",
+                    fontSize = 14.sp,
+                    color = Color.DarkGray
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ExpandableBoxTechnicalScope(
+    uiState: ProjectDashboardUiState
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    // Animate arrow rotation
+    val rotation by animateFloatAsState(if (expanded) 90f else 0f, label = "arrowRotation")
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { expanded = !expanded } // Toggle dropdown
+            .padding(vertical = 8.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = painterResource(R.drawable.play_arrow_filled),
+                contentDescription = "Arrow",
+                modifier = Modifier.rotate(rotation)
+            )
+
+            Spacer(modifier = Modifier.width(13.dp))
+
+            Text(
+                text = "Technical Scope",
+                style = TextStyle(
+                    color = MaterialTheme.colorScheme.primary,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            )
+        }
+
+        // Animated dropdown content
+        AnimatedVisibility(visible = expanded) {
+            Column(modifier = Modifier.padding(start = 37.dp, top = 8.dp)) {
+                Text(
+                    text = "Initial Contract Value: ${uiState.initialContractValue}",
+                    fontSize = 14.sp,
+                    color = Color.DarkGray
+                )
+                Text(
+                    text = "Estimated Total Man Hours: ${uiState.estimatedTotalManHours}",
+                    fontSize = 14.sp,
+                    color = Color.DarkGray
+                )
+                Text(
+                    text = "Earthwork Volume: ${uiState.earthworkVolume}",
+                    fontSize = 14.sp,
+                    color = Color.DarkGray
+                )
+                Text(
+                    text = "Concrete Volume: ${uiState.concreteVolume}",
+                    fontSize = 14.sp,
+                    color = Color.DarkGray
+                )
+                Text(
+                    text = "Structural Steel Weight: ${uiState.structuralSteelWeight}",
+                    fontSize = 14.sp,
+                    color = Color.DarkGray
+                )
+                Text(
+                    text = "Main Installation Length: ${uiState.mainInstallationLength}",
+                    fontSize = 14.sp,
+                    color = Color.DarkGray
+                )
+                Text(
+                    text = "Number Of Installation Endpoint: ${uiState.numberOfInstallationEndpoint}",
+                    fontSize = 14.sp,
+                    color = Color.DarkGray
+                )
+            }
+        }
+    }
+}
+@Composable
+fun ExpandableBoxExternalContext(
+    uiState: ProjectDashboardUiState
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    // Animate arrow rotation
+    val rotation by animateFloatAsState(if (expanded) 90f else 0f, label = "arrowRotation")
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { expanded = !expanded } // Toggle dropdown
+            .padding(vertical = 8.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = painterResource(R.drawable.play_arrow_filled),
+                contentDescription = "Arrow",
+                modifier = Modifier.rotate(rotation)
+            )
+
+            Spacer(modifier = Modifier.width(13.dp))
+
+            Text(
+                text = "External Context",
+                style = TextStyle(
+                    color = MaterialTheme.colorScheme.primary,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            )
+        }
+
+        // Animated dropdown content
+        AnimatedVisibility(visible = expanded) {
+            Column(modifier = Modifier.padding(start = 37.dp, top = 8.dp)) {
+                Text(
+                    text = "Location: ${uiState.location}",
+                    fontSize = 14.sp,
+                    color = Color.DarkGray
+                )
+                Text(
+                    text = "Area Type: ${uiState.areaType}",
+                    fontSize = 14.sp,
+                    color = Color.DarkGray
+                )
+                Text(
+                    text = "Season: ${uiState.season}",
+                    fontSize = 14.sp,
+                    color = Color.DarkGray
+                )
+                Text(
+                    text = "Geotechnical Risk Level: ${uiState.geotechnicalRiskLevel}",
+                    fontSize = 14.sp,
+                    color = Color.DarkGray
+                )
+                Text(
+                    text = "Commodity Price Index: ${uiState.commodityPriceIndex}",
+                    fontSize = 14.sp,
+                    color = Color.DarkGray
+                )
+                Text(
+                    text = "Number Of Tender Competitor: ${uiState.numberOfTenderCompetitor}",
+                    fontSize = 14.sp,
+                    color = Color.DarkGray
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ExpandableBoxInternalFactors(
+    uiState: ProjectDashboardUiState
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    // Animate arrow rotation
+    val rotation by animateFloatAsState(if (expanded) 90f else 0f, label = "arrowRotation")
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { expanded = !expanded } // Toggle dropdown
+            .padding(vertical = 8.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = painterResource(R.drawable.play_arrow_filled),
+                contentDescription = "Arrow",
+                modifier = Modifier.rotate(rotation)
+            )
+
+            Spacer(modifier = Modifier.width(13.dp))
+
+            Text(
+                text = "Internal Factors",
+                style = TextStyle(
+                    color = MaterialTheme.colorScheme.primary,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            )
+        }
+
+        // Animated dropdown content
+        AnimatedVisibility(visible = expanded) {
+            Column(modifier = Modifier.padding(start = 37.dp, top = 8.dp)) {
+                Text(
+                    text = "Project Manager Experience Years: ${uiState.projectManagerExperienceYears}",
+                    fontSize = 14.sp,
+                    color = Color.DarkGray
+                )
+                Text(
+                    text = "Core Team Size: ${uiState.coreTeamSize}",
+                    fontSize = 14.sp,
+                    color = Color.DarkGray
+                )
+                Text(
+                    text = "Subcontractor Percentage: ${uiState.subcontractorPercentage}",
+                    fontSize = 14.sp,
+                    color = Color.DarkGray
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ExpandableBoxPredictionResults(
+    uiState: ProjectDashboardUiState
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    // Animate arrow rotation
+    val rotation by animateFloatAsState(if (expanded) 90f else 0f, label = "arrowRotation")
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { expanded = !expanded } // Toggle dropdown
+            .padding(vertical = 8.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = painterResource(R.drawable.play_arrow_filled),
+                contentDescription = "Arrow",
+                modifier = Modifier.rotate(rotation)
+            )
+
+            Spacer(modifier = Modifier.width(13.dp))
+
+            Text(
+                text = "Prediction Results",
+                style = TextStyle(
+                    color = MaterialTheme.colorScheme.primary,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            )
+        }
+
+        // Animated dropdown content
+        AnimatedVisibility(visible = expanded) {
+            Column(modifier = Modifier.padding(start = 37.dp, top = 8.dp)) {
+                Text(
+                    text = "Estimated Final Cost: Rp ${uiState.biaya_akhir_riil_miliar_rp}",
+                    fontSize = 14.sp,
+                    color = Color.DarkGray
+                )
+                Text(
+                    text = "Estimated Duration: ${uiState.durasi_akhir_riil_hari} days",
+                    fontSize = 14.sp,
+                    color = Color.DarkGray
+                )
+                Text(
+                    text = "Profit Margin: ${uiState.profit_margin_riil_persen}%",
+                    fontSize = 14.sp,
+                    color = Color.DarkGray
+                )
+                Text(
+                    text = "Significant Late Duration: ${uiState.terjadi_keterlambatan_signifikan}",
+                    fontSize = 14.sp,
+                    color = Color.DarkGray
+                )
+                Text(
+                    text = "Significant Inflation Cost: ${uiState.terjadi_pembengkakan_biaya_signifikan}",
                     fontSize = 14.sp,
                     color = Color.DarkGray
                 )
@@ -401,26 +771,27 @@ fun ExpandableBox(text: String, desc: String) {
 
 
 @Composable
-fun CheckList() {
-    val items = listOf(
-        "Project Kick-off & Final Permits",
-        "Site Survey and Staking",
-        "Site Clearing and Grubbing"
-    )
+fun CheckList(
+    viewModel: ProjectDashboardViewModel,
+    projectViewModel: ProjectViewModel
+) {
+    val uiState by viewModel.uiState.collectAsState()
 
-    val checkedStates = remember { mutableStateListOf(false, false, false) }
+    val tasks = uiState.tasks
 
     Column (
-        modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceContainer)
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surfaceContainer)
     ) {
-        items.forEachIndexed { index, item ->
+        tasks.forEachIndexed { index, item ->
             Row (
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = item,
+                    text = item.name,
                     style = MaterialTheme.typography.bodyLarge.copy(
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Normal
@@ -428,8 +799,16 @@ fun CheckList() {
                 )
 
                 Checkbox(
-                    checked = checkedStates[index],
-                    onCheckedChange = { checkedStates[index] = it },
+                    checked = if (item.finished == "yes") true else false,
+                    onCheckedChange = {
+                        viewModel.setFinishedTask(index, it)
+
+                        Log.d("Update project", "On dashbaord progress: ${viewModel.getProgress()}")
+                        projectViewModel.updateProjectProgress(
+                            projectId = uiState.projectId,
+                            progress = viewModel.getProgress()
+                        )
+                    },
                     colors = CheckboxDefaults.colors(
                         checkedColor = MaterialTheme.colorScheme.primary,
                         checkmarkColor = Color.White
@@ -437,7 +816,7 @@ fun CheckList() {
                 )
             }
 
-            if(index != items.lastIndex) {
+            if(index != tasks.lastIndex) {
                 Spacer(modifier = Modifier.height(8.dp))
 
                 HorizontalDivider(color = Color.Gray.copy(alpha = 0.4f), thickness = 1.dp)
@@ -449,7 +828,9 @@ fun CheckList() {
         Spacer(modifier = Modifier.height(42.dp))
 
         Row(
-            modifier = Modifier.fillMaxWidth().padding(end = 28.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(end = 28.dp),
             horizontalArrangement = Arrangement.End
         ) {
             Text(
@@ -478,6 +859,7 @@ fun CheckList() {
 fun HomePreview() {
     DeepPlanTheme { // wrap in your app theme
         ProjectDashboardScreen(
+            viewModel(),
             viewModel()
         )
     }

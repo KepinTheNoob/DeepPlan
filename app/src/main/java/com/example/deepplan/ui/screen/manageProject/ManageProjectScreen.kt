@@ -38,7 +38,10 @@ import androidx.navigation.compose.rememberNavController
 import com.example.deepplan.ui.theme.Typography
 import com.example.deepplan.R
 import com.example.deepplan.data.Project
+import com.example.deepplan.data.ProjectOverview
+import com.example.deepplan.data.ProjectViewModel
 import com.example.deepplan.data.Screen
+import com.example.deepplan.ui.screen.projectDashboardScreen.ProjectDashboardViewModel
 
 val Typography = Typography(
     displaySmall = TextStyle(
@@ -72,14 +75,19 @@ val Typography = Typography(
 @Composable
 fun ManageProjectScreen(
     viewModel: ManageProjectViewModel,
-    navController: NavController = rememberNavController(),
+    projectViewModel: ProjectViewModel,
+    projectDashboardViewModel: ProjectDashboardViewModel,
+    navController: NavHostController = rememberNavController(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val projectUiState by projectViewModel.uiState.collectAsState()
 
     var showProjectsCard by remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState.finishedLoadingProjects) {
-        viewModel.loadProjects()
+        viewModel.loadProjects(
+            projectUiState.projects
+        )
         Log.d("Loading Projects", "Loading selesai: ${uiState.finishedLoadingProjects}")
 
         if (uiState.finishedLoadingProjects) {
@@ -173,7 +181,11 @@ fun ManageProjectScreen(
 
                         if (projects.isNotEmpty()) {
                             projects.forEach { project ->
-                                ProjectCard(project)
+                                ProjectCard(
+                                    project = project,
+                                    navController = navController,
+                                    projectDashboardViewModel = projectDashboardViewModel,
+                                )
                                 Spacer(modifier = Modifier.height(12.dp))
                             }
                         }
@@ -221,13 +233,20 @@ fun ManageProjectScreen(
 }
 
 @Composable
-fun ProjectCard(project: Project) {
+fun ProjectCard(
+    project: ProjectOverview,
+    projectDashboardViewModel: ProjectDashboardViewModel,
+    navController: NavHostController = rememberNavController()
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp)),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-        onClick = {}
+        onClick = {
+            projectDashboardViewModel.setProjectId(project.id)
+            navController.navigate(Screen.Home.name)
+        }
     ) {
         Box(
             modifier = Modifier
@@ -260,7 +279,7 @@ fun ProjectCard(project: Project) {
 
                 // Middle: Project name
                 Text(
-                    text = project.projectName,
+                    text = project.name,
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.weight(1f),
@@ -283,5 +302,7 @@ fun ProjectCard(project: Project) {
 fun HomepagePreview() {
     ManageProjectScreen(
         viewModel = viewModel(),
+        projectViewModel = viewModel(),
+        projectDashboardViewModel = viewModel(),
     )
 }

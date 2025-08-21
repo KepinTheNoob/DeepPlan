@@ -29,12 +29,16 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.deepplan.R
+import com.example.deepplan.data.ProjectViewModel
 import com.example.deepplan.data.Screen
+import com.example.deepplan.ui.screen.projectDashboardScreen.ProjectDashboardViewModel
 import com.example.deepplan.ui.theme.Typography
 
 @Composable
 fun PredictionResultsScreen(
     viewModel: NewProjectViewModel,
+    projectViewModel: ProjectViewModel,
+    projectDashboardViewModel: ProjectDashboardViewModel,
     navController: NavHostController = rememberNavController(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -56,7 +60,9 @@ fun PredictionResultsScreen(
         }
         showPredictionResultsContent && uiState.predictionCompleted -> {
             PredictionResultsContent(
-                viewModel,
+                viewModel = viewModel,
+                projectViewModel = projectViewModel,
+                projectDashboardViewModel = projectDashboardViewModel,
                 navController
             )
         }
@@ -66,6 +72,8 @@ fun PredictionResultsScreen(
 @Composable
 fun PredictionResultsContent(
     viewModel: NewProjectViewModel,
+    projectViewModel: ProjectViewModel,
+    projectDashboardViewModel: ProjectDashboardViewModel,
     navController: NavHostController = rememberNavController(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -258,7 +266,15 @@ fun PredictionResultsContent(
             Button(
                 onClick = {
                     viewModel.setPredictionCompleted(false)
-                    navController.navigate(Screen.Home.name)
+                    Log.d("Loading Prediction", "Project ID: ${uiState.savedProjectId}")
+                    projectViewModel.loadProjects(
+                        goToDashboardAfterPredict = true,
+                        navigateToDashboard = {
+                            projectDashboardViewModel.setProjectId(uiState.savedProjectId)
+                            navController.navigate(Screen.Home.name)
+                        }
+                    )
+                    Log.d("Loading Finish", "Selesai loading ke dashboard")
                 },
 //                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
                 modifier = Modifier
@@ -279,5 +295,7 @@ fun PredictionResultsContent(
 fun PredictionResultsScreenPreview() {
     PredictionResultsContent(
         viewModel = viewModel(),
+        projectDashboardViewModel = viewModel(),
+        projectViewModel = viewModel(),
     )
 }
