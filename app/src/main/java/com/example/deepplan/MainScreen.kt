@@ -53,7 +53,7 @@ import com.example.deepplan.ui.screen.newProject.InternalFactorsScreen
 import com.example.deepplan.ui.screen.newProject.NewProjectViewModel
 import com.example.deepplan.ui.screen.newProject.PredictionResultsScreen
 import com.example.deepplan.ui.screen.newProject.TechnicalScopeScreen
-import com.example.deepplan.ui.screen.predictionLoading.CookieMorphingAnimation
+import com.example.deepplan.ui.screen.predictionLoading.ProjectLoadingScreen
 import com.example.deepplan.ui.screen.profile.ProfileScreen
 import kotlinx.coroutines.launch
 
@@ -190,10 +190,8 @@ fun MainContent(
             )
         }
 
-        // Temporary Pages
-        composable(Screen.Loading.name) {
-            CookieMorphingAnimation()
-        }
+        composable("prediction_loading") {ProjectLoadingScreen()}
+
 
     }
 }
@@ -218,7 +216,7 @@ fun MainScreen(
     LaunchedEffect(authState.value) {
         Log.d("Auth", authState.value.toString())
         when(authState.value) {
-            is AuthState.Authenticated -> startScreen = Screen.Loading
+            is AuthState.Authenticated -> startScreen = Screen.Home
             is AuthState.Error -> Toast.makeText(context,
                 (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT).show()
             else -> startScreen = Screen.Login

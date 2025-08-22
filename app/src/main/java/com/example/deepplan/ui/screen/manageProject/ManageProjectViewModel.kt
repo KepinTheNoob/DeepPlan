@@ -20,6 +20,12 @@ class ManageProjectViewModel: ViewModel() {
     )
     val uiState: StateFlow<ManageProjectUiState> = _uiState.asStateFlow()
 
+    fun deleteProject(project: Project) {
+        val updatedProjects = _uiState.value.projects.toMutableList()
+        updatedProjects.remove(project)
+
+        _uiState.value = _uiState.value.copy(projects = updatedProjects)
+    }
     fun loadProjects() {
         val db = Firebase.firestore
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid

@@ -10,8 +10,5 @@ enum class Screen(val title: String) {
     NewProjectInternalFactors("New Project - Internal Factors"),
     Prediction("Prediction"),
     ManageProject("Manage Project"),
-    Profile("Profile Screen"),
-
-    // Temporary pages
-    Loading("Loading"),
+    Profile("Profile Screen")
 }
