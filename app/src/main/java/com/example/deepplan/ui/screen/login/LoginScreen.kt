@@ -1,6 +1,8 @@
 package com.example.deepplan.ui.screen.login
 
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -47,6 +49,8 @@ import com.example.deepplan.AuthState
 import com.example.deepplan.AuthViewModel
 import com.example.deepplan.R
 import com.example.deepplan.data.Screen
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 
 @Composable
 fun Login(navController: NavHostController, authViewModel: AuthViewModel) {
@@ -59,6 +63,27 @@ fun Login(navController: NavHostController, authViewModel: AuthViewModel) {
 
     val authState = authViewModel.authState.observeAsState()
     val context = LocalContext.current
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        try {
+            val account = task.result
+            val idToken = account.idToken
+            if (idToken != null) {
+                authViewModel.firebaseAuthWithGoogle(idToken) { success, error ->
+                    if (success) {
+                        Toast.makeText(context, "Google Sign-in Successful", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(context, "Google Sign-in Failed: $error", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Toast.makeText(context, "Google Sign in Failed: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
 
 //    LaunchedEffect(authState.value) {
 //        when(authState.value) {
@@ -239,7 +264,14 @@ fun Login(navController: NavHostController, authViewModel: AuthViewModel) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 OutlinedButton (
-                    onClick = {},
+                    onClick = {
+                        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                            .requestIdToken(context.getString(R.string.default_web_client_id))
+                            .requestEmail()
+                            .build()
+                        val client = GoogleSignIn.getClient(context, gso)
+                        launcher.launch(client.signInIntent)
+                    },
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier
                         .fillMaxWidth()

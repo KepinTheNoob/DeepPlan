@@ -88,7 +88,7 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.12.0"))
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.ai.client.generativeai:generativeai:0.6.0")
-
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
 
 }
