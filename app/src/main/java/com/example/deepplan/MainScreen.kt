@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
@@ -25,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -47,7 +49,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.deepplan.data.ProjectViewModel
@@ -367,7 +371,13 @@ fun MainScreen(
                                     .padding(end = 50.dp)
                             ) {
                                 ModalDrawerSheet {
-                                    Text("DeepPlan")
+                                    Text(
+                                        text = "DeepPlan",
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 24.sp,
+                                        modifier = Modifier.padding(16.dp)
+                                    )
                                     HorizontalDivider()
                                     NavigationDrawerItem(
                                         label = { Text("Projects List") },
@@ -381,7 +391,14 @@ fun MainScreen(
                                                     if (isOpen) close() else open()
                                                 }
                                             }
-                                        }
+                                        },
+                                        shape = if (currentScreen == Screen.ManageProject) RoundedCornerShape(0.dp) else RoundedCornerShape(0.dp),
+                                        colors = NavigationDrawerItemDefaults.colors(
+                                            selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                                            unselectedContainerColor = MaterialTheme.colorScheme.surface, // returns to white/surface when not selected
+                                            selectedTextColor = MaterialTheme.colorScheme.primary,
+                                            unselectedTextColor = MaterialTheme.colorScheme.onSurface
+                                        )
                                     )
                                     NavigationDrawerItem(
                                         label = { Text("Profile") },
@@ -395,7 +412,14 @@ fun MainScreen(
                                                     if (isOpen) close() else open()
                                                 }
                                             }
-                                        }
+                                        },
+                                        shape = if (currentScreen == Screen.Profile) RoundedCornerShape(0.dp) else RoundedCornerShape(0.dp),
+                                        colors = NavigationDrawerItemDefaults.colors(
+                                            selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                                            unselectedContainerColor = MaterialTheme.colorScheme.surface, // white/surface when not selected
+                                            selectedTextColor = MaterialTheme.colorScheme.primary,
+                                            unselectedTextColor = MaterialTheme.colorScheme.onSurface
+                                        )
                                     )
                                 }
                             }
@@ -474,10 +498,7 @@ fun MainScreen(
                         )
                     }
                 }
-
             }
-
         }
     }
-
 }
