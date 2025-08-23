@@ -1,5 +1,7 @@
 package com.example.deepplan.ui.screen.newProject
 
+import android.app.AlertDialog
+import android.media.projection.MediaProjectionManager
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -13,17 +15,21 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -61,6 +67,26 @@ fun InternalFactorsScreen(
     var coreTeamSize by remember { mutableStateOf(uiState.coreTeamSize.toString()) }
     var subcontractorPercentage by remember { mutableStateOf(uiState.subcontractorPercentage.toString()) }
 
+    var showWarningDialog by remember { mutableStateOf(false) }
+    var warningMessage by remember { mutableStateOf("") }
+
+    fun validateFields(): Boolean {
+        val values = listOf(projectManagerExperienceYears, coreTeamSize, subcontractorPercentage)
+        values.forEachIndexed { index, v ->
+            val num = v.toFloatOrNull() ?: 0f
+            if (num == 0f) {
+                warningMessage = when (index) {
+                    0 -> "Project Manager Experience Years cannot be 0 or empty."
+                    1 -> "Number of Core Team Size cannot be 0 or empty."
+                    2 -> "Number of Subcontractor Percentage cannot be 0 or empty."
+                    else -> "Please fill all fields."
+                }
+                return false
+            }
+        }
+        return true
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -72,7 +98,7 @@ fun InternalFactorsScreen(
                 .verticalScroll(scrollState)
                 .padding(bottom = 100.dp)
         ) {
-
+            StepIndicator(totalSteps = 4, currentStep = 4)
             Text(
                 "Internal Factors",
                 color = MaterialTheme.colorScheme.surface,
@@ -81,7 +107,7 @@ fun InternalFactorsScreen(
                 modifier = Modifier.padding(
                     start = 32.dp,
                     top = 22.dp,
-                    bottom = 45.dp
+                    bottom = 27.dp
                 )
             )
 
@@ -126,7 +152,12 @@ fun InternalFactorsScreen(
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(48.dp)
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    )
                 )
             }
 
@@ -171,7 +202,12 @@ fun InternalFactorsScreen(
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(48.dp)
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    )
                 )
             }
             Column(
@@ -216,7 +252,12 @@ fun InternalFactorsScreen(
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(48.dp)
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    )
                 )
             }
         }
@@ -259,28 +300,43 @@ fun InternalFactorsScreen(
             }
             Button(
                 onClick = {
-                    viewModel.doPrediction()
-                    navController.navigate(Screen.Prediction.name)
+                    if (validateFields()) {
+                        viewModel.setInternalContextValues(
+                            projectManagerExperienceYears.toInt(),
+                            coreTeamSize.toInt(),
+                            subcontractorPercentage.toFloat()
+                        )
+                        viewModel.doPrediction()
+                        navController.navigate(Screen.Prediction.name)
+                    } else {
+                        showWarningDialog = true
+                    }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.onPrimaryContainer)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         painter = painterResource(R.drawable.baseline_check_24),
                         contentDescription = "Done",
                         tint = MaterialTheme.colorScheme.surfaceBright
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        "Done",
-                        style = Typography.labelLarge,
-                        color = MaterialTheme.colorScheme.surfaceBright
-                    )
+                    Text("Done", style = Typography.labelLarge, color = MaterialTheme.colorScheme.surfaceBright)
                 }
             }
         }
+    }
+    if (showWarningDialog) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showWarningDialog = false },
+            confirmButton = {
+                TextButton(onClick = { showWarningDialog = false }) {
+                    Text("OK")
+                }
+            },
+            title = { Text("Invalid Input") },
+            text = { Text(warningMessage) }
+        )
     }
 }
 

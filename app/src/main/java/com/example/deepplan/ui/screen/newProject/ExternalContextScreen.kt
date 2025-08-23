@@ -1,5 +1,9 @@
 package com.example.deepplan.ui.screen.newProject
 
+import android.R
+import android.view.RoundedCorner
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,9 +13,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -28,7 +34,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -38,6 +46,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -56,7 +65,7 @@ import kotlin.math.roundToInt
 fun ExternalContextScreen(
     viewModel: NewProjectViewModel,
     navController: NavHostController = rememberNavController(),
-    ) {
+) {
     val uiState by viewModel.uiState.collectAsState()
 
     var scrollState = rememberScrollState()
@@ -121,6 +130,24 @@ fun ExternalContextScreen(
 
     var numberOfTenderCompetitor by remember { mutableStateOf(uiState.numberOfTenderCompetitor.toString()) }
 
+    var showWarningDialog by remember { mutableStateOf(false) }
+    var warningMessage by remember { mutableStateOf("") }
+
+    fun validateFields(): Boolean {
+        val values = listOf(comodityPriceIndex, numberOfTenderCompetitor)
+        values.forEachIndexed { index, v ->
+            val num = v.toFloatOrNull() ?: 0f
+            if (num == 0f) {
+                warningMessage = when (index) {
+                    0 -> "Commodity Price Index cannot be 0 or empty."
+                    1 -> "Number of Tender Competitors cannot be 0 or empty."
+                    else -> "Please fill all fields."
+                }
+                return false
+            }
+        }
+        return true
+    }
 
     Box(
         modifier = Modifier
@@ -133,7 +160,7 @@ fun ExternalContextScreen(
                 .background(MaterialTheme.colorScheme.primary)
                 .verticalScroll(scrollState)
         ) {
-
+            StepIndicator(totalSteps = 4, currentStep = 3)
             Text(
                 "External Context",
                 color = MaterialTheme.colorScheme.surface,
@@ -142,7 +169,7 @@ fun ExternalContextScreen(
                 modifier = Modifier.padding(
                     start = 32.dp,
                     top = 22.dp,
-                    bottom = 45.dp
+                    bottom = 27.dp
                 )
             )
 
@@ -165,23 +192,53 @@ fun ExternalContextScreen(
                     expanded = locationExpanded,
                     onExpandedChange = { locationExpanded = !locationExpanded }
                 ) {
-                    TextField(
-                        value = selectedLocation,
-                        onValueChange = {},
-                        readOnly = true,
-                        textStyle = MaterialTheme.typography.bodyLarge.copy(
-                            fontSize = 14.sp
-                        ),
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = locationExpanded) },
-                        modifier = Modifier
-                            .menuAnchor()
-                            .fillMaxWidth()
-                            .height(48.dp)
+                    val bottomCornerRadius by animateDpAsState(
+                        targetValue = if (locationExpanded) 0.dp else 16.dp,
+                        animationSpec = tween(durationMillis = 250)
                     )
+
+                    Column {
+                        TextField(
+                            value = selectedLocation,
+                            onValueChange = {},
+                            readOnly = true,
+                            textStyle = MaterialTheme.typography.bodyLarge.copy(
+                                fontSize = 14.sp
+                            ),
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = locationExpanded)
+                            },
+                            modifier = Modifier
+                                .menuAnchor()
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            shape = RoundedCornerShape(
+                                topStart = 16.dp,
+                                topEnd = 16.dp,
+                                bottomStart = bottomCornerRadius,
+                                bottomEnd = bottomCornerRadius
+                            ),
+                            colors = TextFieldDefaults.colors(
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent
+                            )
+                        )
+
+                        if (locationExpanded) {
+                            Spacer(modifier = Modifier.height(2.dp))
+                        }
+                    }
 
                     ExposedDropdownMenu(
                         expanded = locationExpanded,
-                        onDismissRequest = { locationExpanded = false }
+                        onDismissRequest = { locationExpanded = false },
+                        modifier = Modifier.offset(y = 4.dp),
+                        shape = RoundedCornerShape(
+                            topStart = 0.dp,
+                            topEnd = 0.dp,
+                            bottomStart = 16.dp,
+                            bottomEnd = 16.dp
+                        )
                     ) {
                         locations.forEach { type ->
                             DropdownMenuItem(
@@ -215,23 +272,53 @@ fun ExternalContextScreen(
                     expanded = areaTypeExpanded,
                     onExpandedChange = { areaTypeExpanded = !areaTypeExpanded }
                 ) {
-                    TextField(
-                        value = selectedAreaType,
-                        onValueChange = {},
-                        readOnly = true,
-                        textStyle = MaterialTheme.typography.bodyLarge.copy(
-                            fontSize = 14.sp
-                        ),
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = areaTypeExpanded) },
-                        modifier = Modifier
-                            .menuAnchor()
-                            .fillMaxWidth()
-                            .height(48.dp)
+                    val bottomCornerRadius by animateDpAsState(
+                        targetValue = if (areaTypeExpanded) 0.dp else 16.dp,
+                        animationSpec = tween(durationMillis = 250)
                     )
+
+                    Column {
+                        TextField(
+                            value = selectedAreaType,
+                            onValueChange = {},
+                            readOnly = true,
+                            textStyle = MaterialTheme.typography.bodyLarge.copy(
+                                fontSize = 14.sp
+                            ),
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = areaTypeExpanded)
+                            },
+                            modifier = Modifier
+                                .menuAnchor()
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            shape = RoundedCornerShape(
+                                topStart = 16.dp,
+                                topEnd = 16.dp,
+                                bottomStart = bottomCornerRadius,
+                                bottomEnd = bottomCornerRadius
+                            ),
+                            colors = TextFieldDefaults.colors(
+                                unfocusedIndicatorColor = Color.Transparent,
+                                focusedIndicatorColor = Color.Transparent
+                            )
+                        )
+
+                        if (areaTypeExpanded) {
+                            Spacer(modifier = Modifier.height(2.dp))
+                        }
+                    }
 
                     ExposedDropdownMenu(
                         expanded = areaTypeExpanded,
-                        onDismissRequest = { areaTypeExpanded = false }
+                        onDismissRequest = { areaTypeExpanded = false },
+                        modifier = Modifier.offset(y = 4.dp),
+                        shape = RoundedCornerShape(
+                            topStart = 0.dp,
+                            topEnd = 0.dp,
+                            bottomStart = 16.dp,
+                            bottomEnd = 16.dp
+                        )
                     ) {
                         areaTypes.forEach { type ->
                             DropdownMenuItem(
@@ -273,23 +360,53 @@ fun ExternalContextScreen(
                     expanded = seasonExpanded,
                     onExpandedChange = { seasonExpanded = !seasonExpanded }
                 ) {
-                    TextField(
-                        value = selectedSeason,
-                        onValueChange = {},
-                        readOnly = true,
-                        textStyle = MaterialTheme.typography.bodyLarge.copy(
-                            fontSize = 14.sp
-                        ),
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = seasonExpanded) },
-                        modifier = Modifier
-                            .menuAnchor()
-                            .fillMaxWidth()
-                            .height(48.dp)
+                    val bottomCornerRadius by animateDpAsState(
+                        targetValue = if (seasonExpanded) 0.dp else 16.dp,
+                        animationSpec = tween(durationMillis = 250)
                     )
+
+                    Column {
+                        TextField(
+                            value = selectedSeason,
+                            onValueChange = {},
+                            readOnly = true,
+                            textStyle = MaterialTheme.typography.bodyLarge.copy(
+                                fontSize = 14.sp
+                            ),
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = seasonExpanded)
+                            },
+                            modifier = Modifier
+                                .menuAnchor()
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            shape = RoundedCornerShape(
+                                topStart = 16.dp,
+                                topEnd = 16.dp,
+                                bottomStart = bottomCornerRadius,
+                                bottomEnd = bottomCornerRadius
+                            ),
+                            colors = TextFieldDefaults.colors(
+                                unfocusedIndicatorColor = Color.Transparent,
+                                focusedIndicatorColor = Color.Transparent
+                            )
+                        )
+
+                        if (seasonExpanded) {
+                            Spacer(modifier = Modifier.height(2.dp))
+                        }
+                    }
 
                     ExposedDropdownMenu(
                         expanded = seasonExpanded,
-                        onDismissRequest = { seasonExpanded = false }
+                        onDismissRequest = { seasonExpanded = false },
+                        modifier = Modifier.offset(y = 4.dp),
+                        shape = RoundedCornerShape(
+                            topStart = 0.dp,
+                            topEnd = 0.dp,
+                            bottomStart = 16.dp,
+                            bottomEnd = 16.dp
+                        )
                     ) {
                         seasons.forEach { type ->
                             DropdownMenuItem(
@@ -386,7 +503,12 @@ fun ExternalContextScreen(
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(48.dp)
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    )
                 )
             }
             Column(
@@ -428,7 +550,12 @@ fun ExternalContextScreen(
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(48.dp)
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    )
                 )
             }
             Spacer(modifier = Modifier
@@ -481,29 +608,25 @@ fun ExternalContextScreen(
             }
             Button(
                 onClick = {
-                    viewModel.setExternalContextValues(
-                        selectedLocation,
-                        selectedAreaType,
-                        selectedSeason,
-                        geotechnicalRiskLevel.toInt(),
-                        comodityPriceIndex.toFloat(),
-                        numberOfTenderCompetitor.toInt()
-                    )
-
-                    navController.navigate(Screen.NewProjectInternalFactors.name)
+                    if (validateFields()) {
+                        viewModel.setExternalContextValues(
+                            selectedLocation,
+                            selectedAreaType,
+                            selectedSeason,
+                            geotechnicalRiskLevel.toInt(),
+                            comodityPriceIndex.toFloat(),
+                            numberOfTenderCompetitor.toInt()
+                        )
+                        navController.navigate(Screen.NewProjectInternalFactors.name)
+                    } else {
+                        showWarningDialog = true
+                    }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
-                modifier = Modifier
-                    .padding(end = 36.dp, bottom = 24.dp, top = 24.dp)
+                modifier = Modifier.padding(end = 36.dp, bottom = 24.dp, top = 24.dp)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        "Next",
-                        style = Typography.labelLarge,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer
-                    )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("Next", style = Typography.labelLarge, color = MaterialTheme.colorScheme.onSecondaryContainer)
                     Spacer(modifier = Modifier.width(8.dp))
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowForward,
@@ -513,6 +636,19 @@ fun ExternalContextScreen(
                 }
             }
         }
+    }
+
+    if (showWarningDialog) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showWarningDialog = false },
+            confirmButton = {
+                TextButton(onClick = { showWarningDialog = false }) {
+                    Text("OK")
+                }
+            },
+            title = { Text("Invalid Input") },
+            text = { Text(warningMessage) }
+        )
     }
 }
 

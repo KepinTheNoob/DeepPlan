@@ -44,4 +44,25 @@ class ManageProjectViewModel: ViewModel() {
             )
         }
     }
+
+    fun deleteProject(project: ProjectOverview) {
+        val db = Firebase.firestore
+
+        viewModelScope.launch {
+            try {
+                Log.d("Delete Project", "Attempting to delete project with ID: ${project.id}")
+                db.collection("projects").document(project.id).delete().await()
+
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        projects = currentState.projects.filter { it.id != project.id }
+                    )
+                }
+
+                Log.d("Delete Project", "Project ${project.name} deleted successfully")
+            } catch (e: Exception) {
+                Log.e("Delete Project", "Error deleting project with ID: ${project.id}", e)
+            }
+        }
+    }
 }

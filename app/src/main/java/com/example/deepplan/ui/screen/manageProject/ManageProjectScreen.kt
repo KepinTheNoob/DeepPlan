@@ -7,9 +7,12 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
@@ -81,8 +84,10 @@ fun ManageProjectScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val projectUiState by projectViewModel.uiState.collectAsState()
-
     var showProjectsCard by remember { mutableStateOf(false) }
+    var isEditMode by remember { mutableStateOf(false) }
+    var projectToDelete by remember { mutableStateOf<ProjectOverview?>(null) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState.finishedLoadingProjects) {
         viewModel.loadProjects(
@@ -109,26 +114,6 @@ fun ManageProjectScreen(
                     .weight(0.4f) // Takes up a portion of the screen height
                     .background(MaterialTheme.colorScheme.primary)
             ) {
-//                // Top app bar with icons
-//                Row(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(16.dp),
-//                    horizontalArrangement = Arrangement.SpaceBetween,
-//                    verticalAlignment = Alignment.CenterVertically
-//                ) {
-//                    Icon(
-//                        imageVector = Icons.Default.Menu,
-//                        contentDescription = "Menu",
-//                        tint = MaterialTheme.colorScheme.onPrimary
-//                    )
-////                    Image(
-////                        painter = painterResource(id = com.example.deepplan.R.drawable.avatar), // Use your image name here
-////                        contentDescription = "User Profile",
-////                        modifier = Modifier.size(24.dp), // Set the desired size for the image
-////                    )
-//                }
-
                 Text(
                     text = "Welcome to\nDeepPlan",
                     style = MaterialTheme.typography.displaySmall,
@@ -139,6 +124,7 @@ fun ManageProjectScreen(
                 )
             }
 
+            // Bottom Section
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -159,74 +145,118 @@ fun ManageProjectScreen(
                         color = MaterialTheme.colorScheme.onBackground
                     )
                     if (showProjectsCard && uiState.finishedLoadingProjects) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "Edit",
-                            tint = MaterialTheme.colorScheme.onBackground
-                        )
+                        IconButton(onClick = { isEditMode = !isEditMode }) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "Edit",
+                                tint = if (isEditMode) MaterialTheme.colorScheme.error
+                                else MaterialTheme.colorScheme.onBackground
+                            )
+                        }
                     }
                 }
 
                 when {
                     !(uiState.finishedLoadingProjects) -> {
-                        CircularProgressIndicator()
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
                     }
                     showProjectsCard && uiState.finishedLoadingProjects -> {
-
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        // List of project cards
                         val projects = uiState.projects
                         Log.d("Loading Projects", projects.toString())
 
-                        if (projects.isNotEmpty()) {
-                            projects.forEach { project ->
-                                ProjectCard(
-                                    project = project,
-                                    navController = navController,
-                                    projectDashboardViewModel = projectDashboardViewModel,
-                                )
-                                Spacer(modifier = Modifier.height(12.dp))
-                            }
-                        }
-                        else {
-                            Text(
-                                text = "No projects found",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onBackground
-                            )
-                        }
-
-
-                        Spacer(modifier = Modifier.weight(1f)) // Push the button to the bottom
-
-                        // "Add New Project" button
-                        Button(
-                            onClick = {
-                                navController.navigate(Screen.NewProjectGeneralInformation.name)
-                            },
-                            modifier = Modifier
-                                .align(Alignment.End) // Posisikan di kanan bawah
-                                .padding(bottom = 16.dp), // Tambahkan padding untuk jarak dari tepi
-                            shape = RoundedCornerShape(100.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                        Box(
+                            modifier = Modifier.fillMaxSize()
                         ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Add,
-                                    contentDescription = "Add",
-                                    tint = MaterialTheme.colorScheme.onPrimary,
-                                    modifier = Modifier.size(20.dp)
+                            // Project list (or empty state)
+                            if (uiState.projects.isNotEmpty()) {
+                                LazyColumn(
+                                    modifier = Modifier.fillMaxSize()
+                                ) {
+                                    items(uiState.projects) { project ->
+                                        ProjectCard(
+                                            project = project,
+                                            projectDashboardViewModel = projectDashboardViewModel,
+                                            navController = navController,   // ✅ pass the real one
+                                            isEditMode = isEditMode,
+                                            onDeleteClick = {
+                                                projectToDelete = project
+                                                showDeleteDialog = true
+                                            }
+                                        )
+                                    }
+                                }
+                            } else {
+                                Text(
+                                    text = "No projects yet",
+                                    modifier = Modifier.align(Alignment.Center),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                                 )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(text = "Add New Project", color = MaterialTheme.colorScheme.onPrimary)
                             }
+
+                            // ✅ Button is now "anchored" at the bottom right
+                            Button(
+                                onClick = { navController.navigate(Screen.NewProjectGeneralInformation.name) },
+                                shape = RoundedCornerShape(50),
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                                modifier = Modifier
+                                    .align(Alignment.BottomEnd)
+                                    .padding(16.dp)
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.addplusicon),
+                                        contentDescription = "Add",
+                                        tint = MaterialTheme.colorScheme.onPrimary,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = "Add New Project",
+                                        color = MaterialTheme.colorScheme.onPrimary
+                                    )
+                                }
+                            }
+                        }
+
+                        if (showDeleteDialog && projectToDelete != null) {
+                            AlertDialog(
+                                onDismissRequest = { showDeleteDialog = false },
+                                title = { Text("Delete Project") },
+                                text = { Text("Are you sure you want to delete \"${projectToDelete?.name}\"?") },
+                                confirmButton = {
+                                    TextButton(onClick = {
+                                        // ✅ Pass the whole ProjectOverview object
+                                        projectToDelete?.let { project ->
+                                            viewModel.deleteProject(project)
+                                        }
+
+                                        showDeleteDialog = false
+                                        projectToDelete = null
+                                    }) {
+                                        Text("Delete")
+                                    }
+                                },
+                                dismissButton = {
+                                    TextButton(onClick = {
+                                        showDeleteDialog = false
+                                        projectToDelete = null
+                                    }) {
+                                        Text("Cancel")
+                                    }
+                                }
+                            )
                         }
                     }
                 }
-
             }
         }
     }
@@ -236,7 +266,10 @@ fun ManageProjectScreen(
 fun ProjectCard(
     project: ProjectOverview,
     projectDashboardViewModel: ProjectDashboardViewModel,
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    isEditMode: Boolean = false,
+    onDeleteClick: () -> Unit = {}
+
 ) {
     Card(
         modifier = Modifier
@@ -286,12 +319,26 @@ fun ProjectCard(
                     textAlign = TextAlign.End
                 )
                 Spacer(modifier = Modifier.width(12.dp))
-                // Right: Grid icon
-                Image(
-                    painter = painterResource(R.drawable.grid),
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp)
+
+                Box(
+                    modifier = Modifier
+                        .width(4.dp)
+                        .height(40.dp)
+                        .clip(RoundedCornerShape(2.dp))
+                        .background(MaterialTheme.colorScheme.primary)
                 )
+
+                Box(modifier = Modifier.size(40.dp), contentAlignment = Alignment.Center) {
+                    if (isEditMode) {
+                        IconButton(onClick = onDeleteClick, modifier = Modifier.size(24.dp)) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Delete Project",
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
+                }
             }
         }
     }

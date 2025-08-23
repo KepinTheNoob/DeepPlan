@@ -1,5 +1,6 @@
 package com.example.deepplan.ui.screen.newProject
 
+import android.app.AlertDialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,11 +13,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -26,7 +29,9 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -52,7 +57,7 @@ import com.example.deepplan.ui.theme.Typography
 fun TechnicalScopeScreen(
     viewModel: NewProjectViewModel,
     navController: NavController = rememberNavController(),
-    ) {
+) {
     val uiState by viewModel.uiState.collectAsState()
 
     var scrollState = rememberScrollState()
@@ -63,6 +68,38 @@ fun TechnicalScopeScreen(
     var structuralSteelWeight by remember { mutableStateOf(uiState.structuralSteelWeight.toString()) }
     var mainInstallationLength by remember { mutableStateOf(uiState.mainInstallationLength.toString()) }
     var numberOfInstallationEndpoint by remember { mutableStateOf(uiState.numberOfInstallationEndpoint.toString()) }
+    var showWarningDialog by remember {mutableStateOf(false)}
+    var warningMessage by remember {mutableStateOf("")}
+
+    fun validateFields(): Boolean {
+        val values = listOf(
+            initialContractValue,
+            estimatedTotalManHours,
+            earthworkVolume,
+            concreteVolume,
+            structuralSteelWeight,
+            mainInstallationLength,
+            numberOfInstallationEndpoint
+        )
+
+        values.forEachIndexed { index, v ->
+            val num = v.toFloatOrNull() ?: 0f
+            if (num == 0f) {
+                warningMessage = when (index) {
+                    0 -> "Initial Contract Value cannot be 0 or empty."
+                    1 -> "Estimated Total Man Hours cannot be 0 or empty."
+                    2 -> "Earthwork Volume cannot be 0 or empty."
+                    3 -> "Concrete Volume cannot be 0 or empty."
+                    4 -> "Structural Steel Weight cannot be 0 or empty."
+                    5 -> "Main Installation Length cannot be 0 or empty."
+                    6 -> "Number of Installation Endpoints cannot be 0 or empty."
+                    else -> "Please fill all fields."
+                }
+                return false
+            }
+        }
+        return true
+    }
 
     Box(
         modifier = Modifier
@@ -75,7 +112,7 @@ fun TechnicalScopeScreen(
                 .background(MaterialTheme.colorScheme.primary)
                 .verticalScroll(scrollState)
         ) {
-
+            StepIndicator(totalSteps = 4, currentStep = 2)
             Text(
                 "Technical Scope",
                 color = MaterialTheme.colorScheme.surface,
@@ -84,7 +121,7 @@ fun TechnicalScopeScreen(
                 modifier = Modifier.padding(
                     start = 32.dp,
                     top = 22.dp,
-                    bottom = 45.dp
+                    bottom = 27.dp
                 )
             )
 
@@ -129,7 +166,12 @@ fun TechnicalScopeScreen(
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(48.dp)
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    )
                 )
             }
 
@@ -165,7 +207,12 @@ fun TechnicalScopeScreen(
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(48.dp)
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    )
                 )
             }
             Column(
@@ -210,7 +257,12 @@ fun TechnicalScopeScreen(
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(48.dp)
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    )
                 )
             }
             Column(
@@ -255,7 +307,12 @@ fun TechnicalScopeScreen(
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(48.dp)
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    )
                 )
             }
 
@@ -301,7 +358,12 @@ fun TechnicalScopeScreen(
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(48.dp)
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    )
                 )
             }
             Column(
@@ -343,7 +405,12 @@ fun TechnicalScopeScreen(
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(48.dp)
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    )
                 )
             }
 
@@ -386,7 +453,12 @@ fun TechnicalScopeScreen(
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(48.dp)
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    )
                 )
             }
 
@@ -438,17 +510,20 @@ fun TechnicalScopeScreen(
             }
             Button(
                 onClick = {
-                    viewModel.setTechnicalScopeValues(
-                        initialContractValue.toFloat(),
-                        estimatedTotalManHours.toFloat(),
-                        earthworkVolume.toFloat(),
-                        concreteVolume.toFloat(),
-                        structuralSteelWeight.toFloat(),
-                        mainInstallationLength.toFloat(),
-                        numberOfInstallationEndpoint.toInt()
-                    )
-
-                    navController.navigate(Screen.NewProjectExternalContext.name)
+                    if (validateFields()) {
+                        viewModel.setTechnicalScopeValues(
+                            initialContractValue.toFloat(),
+                            estimatedTotalManHours.toFloat(),
+                            earthworkVolume.toFloat(),
+                            concreteVolume.toFloat(),
+                            structuralSteelWeight.toFloat(),
+                            mainInstallationLength.toFloat(),
+                            numberOfInstallationEndpoint.toInt()
+                        )
+                        navController.navigate(Screen.NewProjectExternalContext.name)
+                    } else {
+                        showWarningDialog = true
+                    }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
                 modifier = Modifier
@@ -471,6 +546,18 @@ fun TechnicalScopeScreen(
                 }
             }
         }
+    }
+    if (showWarningDialog) {
+        AlertDialog(
+            onDismissRequest = { showWarningDialog = false },
+            confirmButton = {
+                TextButton(onClick = { showWarningDialog = false }) {
+                    Text("OK")
+                }
+            },
+            title = { Text("Invalid Input") },
+            text = { Text(warningMessage) }
+        )
     }
 }
 

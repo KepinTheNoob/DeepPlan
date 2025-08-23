@@ -1,6 +1,8 @@
 package com.example.deepplan.ui.screen.newProject
 
 import android.util.Log
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,9 +12,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -28,6 +32,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -49,6 +54,8 @@ import com.example.deepplan.data.Screen
 import com.example.deepplan.ui.theme.Typography
 
 @OptIn(ExperimentalMaterial3Api::class)
+
+
 @Composable
 fun GeneralInformationScreen(
     viewModel: NewProjectViewModel,
@@ -89,6 +96,8 @@ fun GeneralInformationScreen(
         "Cost Plus",
         "Harga Satuan",
     )
+    var showDialog by remember {mutableStateOf(false)}
+    var dialogMessage by remember {mutableStateOf("")}
 
     Box(
         modifier = Modifier
@@ -101,6 +110,7 @@ fun GeneralInformationScreen(
                 .background(MaterialTheme.colorScheme.primary)
                 .verticalScroll(scrollState)
         ) {
+            StepIndicator(totalSteps = 4, currentStep = 1)
 
             Text(
                 "General Information",
@@ -110,7 +120,7 @@ fun GeneralInformationScreen(
                 modifier = Modifier.padding(
                     start = 32.dp,
                     top = 22.dp,
-                    bottom = 45.dp
+                    bottom = 26.dp
                 )
             )
 
@@ -125,7 +135,7 @@ fun GeneralInformationScreen(
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.padding(
-                        bottom = 5.dp
+                        bottom = 7.dp
                     )
                 )
 
@@ -138,7 +148,12 @@ fun GeneralInformationScreen(
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(48.dp)
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    )
                 )
             }
 
@@ -153,7 +168,7 @@ fun GeneralInformationScreen(
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.padding(
-                        bottom = 5.dp
+                        bottom = 7.dp
                     )
                 )
 
@@ -161,23 +176,53 @@ fun GeneralInformationScreen(
                     expanded = projectTypeExpanded,
                     onExpandedChange = { projectTypeExpanded = !projectTypeExpanded }
                 ) {
-                    TextField(
-                        value = selectedProjectType,
-                        onValueChange = {},
-                        readOnly = true,
-                        textStyle = MaterialTheme.typography.bodyLarge.copy(
-                            fontSize = 14.sp
-                        ),
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = projectTypeExpanded) },
-                        modifier = Modifier
-                            .menuAnchor()
-                            .fillMaxWidth()
-                            .height(48.dp)
+                    val bottomCornerRadius by animateDpAsState(
+                        targetValue = if (projectTypeExpanded) 0.dp else 16.dp,
+                        animationSpec = tween(durationMillis = 250)
                     )
+
+                    Column {
+                        TextField(
+                            value = selectedProjectType,
+                            onValueChange = {},
+                            readOnly = true,
+                            textStyle = MaterialTheme.typography.bodyLarge.copy(
+                                fontSize = 14.sp
+                            ),
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = projectTypeExpanded)
+                            },
+                            modifier = Modifier
+                                .menuAnchor()
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            shape = RoundedCornerShape(
+                                topStart = 16.dp,
+                                topEnd = 16.dp,
+                                bottomStart = bottomCornerRadius,
+                                bottomEnd = bottomCornerRadius
+                            ),
+                            colors = TextFieldDefaults.colors(
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent
+                            )
+                        )
+
+                        if (projectTypeExpanded) {
+                            Spacer(modifier = Modifier.height(2.dp))
+                        }
+                    }
 
                     ExposedDropdownMenu(
                         expanded = projectTypeExpanded,
-                        onDismissRequest = { projectTypeExpanded = false }
+                        onDismissRequest = { projectTypeExpanded = false },
+                        modifier = Modifier.offset(y = 4.dp),
+                        shape = RoundedCornerShape(
+                            topStart = 0.dp,
+                            topEnd = 0.dp,
+                            bottomStart = 16.dp,
+                            bottomEnd = 16.dp
+                        )
                     ) {
                         projectTypes.forEach { type ->
                             DropdownMenuItem(
@@ -202,13 +247,14 @@ fun GeneralInformationScreen(
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.padding(
-                        bottom = 5.dp
+                        bottom = 7.dp
                     )
                 )
 
                 ExposedDropdownMenuBox(
                     expanded = clientTypeExpanded,
-                    onExpandedChange = { clientTypeExpanded = !clientTypeExpanded }
+                    onExpandedChange = { clientTypeExpanded = !clientTypeExpanded },
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     TextField(
                         value = selectedClientType,
@@ -217,25 +263,87 @@ fun GeneralInformationScreen(
                         textStyle = MaterialTheme.typography.bodyLarge.copy(
                             fontSize = 14.sp
                         ),
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = clientTypeExpanded) },
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = clientTypeExpanded)
+                        },
                         modifier = Modifier
                             .menuAnchor()
                             .fillMaxWidth()
-                            .height(48.dp)
+                            .height(56.dp),
+                        shape = if (clientTypeExpanded) {
+                            RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomStart = 0.dp, bottomEnd = 0.dp)
+                        } else {
+                            RoundedCornerShape(16.dp)
+                        },
+                        colors = TextFieldDefaults.colors(
+                            unfocusedIndicatorColor = Color.Transparent,
+                            focusedIndicatorColor = Color.Transparent,
+                            disabledIndicatorColor = Color.Transparent,
+                            errorIndicatorColor = Color.Transparent
+                        )
                     )
 
-                    ExposedDropdownMenu(
+                    ExposedDropdownMenuBox(
                         expanded = clientTypeExpanded,
-                        onDismissRequest = { clientTypeExpanded = false }
+                        onExpandedChange = { clientTypeExpanded = !clientTypeExpanded }
                     ) {
-                        clientTypes.forEach { type ->
-                            DropdownMenuItem(
-                                text = { Text(text = type) },
-                                onClick = {
-                                    selectedClientType = type
-                                    clientTypeExpanded = false
-                                }
+                        val bottomCornerRadius by animateDpAsState(
+                            targetValue = if (clientTypeExpanded) 0.dp else 16.dp,
+                            animationSpec = tween(durationMillis = 250)
+                        )
+
+                        Column {
+                            TextField(
+                                value = selectedClientType,
+                                onValueChange = {},
+                                readOnly = true,
+                                textStyle = MaterialTheme.typography.bodyLarge.copy(
+                                    fontSize = 14.sp
+                                ),
+                                trailingIcon = {
+                                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = clientTypeExpanded)
+                                },
+                                modifier = Modifier
+                                    .menuAnchor()
+                                    .fillMaxWidth()
+                                    .height(56.dp),
+                                shape = RoundedCornerShape(
+                                    topStart = 16.dp,
+                                    topEnd = 16.dp,
+                                    bottomStart = bottomCornerRadius,
+                                    bottomEnd = bottomCornerRadius
+                                ),
+                                colors = TextFieldDefaults.colors(
+                                    focusedIndicatorColor = Color.Transparent,
+                                    unfocusedIndicatorColor = Color.Transparent
+                                )
                             )
+
+                            if (clientTypeExpanded) {
+                                Spacer(modifier = Modifier.height(4.dp))
+                            }
+                        }
+
+                        ExposedDropdownMenu(
+                            expanded = clientTypeExpanded,
+                            onDismissRequest = { clientTypeExpanded = false },
+                            modifier = Modifier.offset(y = 4.dp),
+                            shape = RoundedCornerShape(
+                                topStart = 0.dp,
+                                topEnd = 0.dp,
+                                bottomStart = 16.dp,
+                                bottomEnd = 16.dp
+                            )
+                        ) {
+                            clientTypes.forEach { type ->
+                                DropdownMenuItem(
+                                    text = { Text(text = type) },
+                                    onClick = {
+                                        selectedClientType = type
+                                        clientTypeExpanded = false
+                                    }
+                                )
+                            }
                         }
                     }
                 }
@@ -251,7 +359,7 @@ fun GeneralInformationScreen(
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.padding(
-                        bottom = 5.dp
+                        bottom = 7.dp
                     )
                 )
 
@@ -259,23 +367,53 @@ fun GeneralInformationScreen(
                     expanded = contractTypeExpanded,
                     onExpandedChange = { contractTypeExpanded = !contractTypeExpanded }
                 ) {
-                    TextField(
-                        value = selectedContractType,
-                        onValueChange = {},
-                        readOnly = true,
-                        textStyle = MaterialTheme.typography.bodyLarge.copy(
-                            fontSize = 14.sp
-                        ),
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = contractTypeExpanded) },
-                        modifier = Modifier
-                            .menuAnchor()
-                            .fillMaxWidth()
-                            .height(48.dp)
+                    val bottomCornerRadius by animateDpAsState(
+                        targetValue = if (contractTypeExpanded) 0.dp else 16.dp,
+                        animationSpec = tween(durationMillis = 250)
                     )
+
+                    Column {
+                        TextField(
+                            value = selectedContractType,
+                            onValueChange = {},
+                            readOnly = true,
+                            textStyle = MaterialTheme.typography.bodyLarge.copy(
+                                fontSize = 14.sp
+                            ),
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = contractTypeExpanded)
+                            },
+                            modifier = Modifier
+                                .menuAnchor()
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            shape = RoundedCornerShape(
+                                topStart = 16.dp,
+                                topEnd = 16.dp,
+                                bottomStart = bottomCornerRadius,
+                                bottomEnd = bottomCornerRadius
+                            ),
+                            colors = TextFieldDefaults.colors(
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent
+                            )
+                        )
+
+                        if (contractTypeExpanded) {
+                            Spacer(modifier = Modifier.height(2.dp))
+                        }
+                    }
 
                     ExposedDropdownMenu(
                         expanded = contractTypeExpanded,
-                        onDismissRequest = { contractTypeExpanded = false }
+                        onDismissRequest = { contractTypeExpanded = false },
+                        modifier = Modifier.offset(y = 4.dp),
+                        shape = RoundedCornerShape(
+                            topStart = 0.dp,
+                            topEnd = 0.dp,
+                            bottomStart = 16.dp,
+                            bottomEnd = 16.dp
+                        )
                     ) {
                         contractTypes.forEach { type ->
                             DropdownMenuItem(
@@ -309,7 +447,7 @@ fun GeneralInformationScreen(
                     color = MaterialTheme.colorScheme.surfaceBright,
                     fontSize = 12.sp,
                     modifier = Modifier.padding(
-                        bottom = 5.dp
+                        bottom = 7.dp
                     )
                 )
 
@@ -317,23 +455,53 @@ fun GeneralInformationScreen(
                     expanded = designAndBuildExpanded,
                     onExpandedChange = { designAndBuildExpanded = !designAndBuildExpanded }
                 ) {
-                    TextField(
-                        value = selectedDesignAndBuild,
-                        onValueChange = {},
-                        readOnly = true,
-                        textStyle = MaterialTheme.typography.bodyLarge.copy(
-                            fontSize = 14.sp
-                        ),
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = designAndBuildExpanded) },
-                        modifier = Modifier
-                            .menuAnchor()
-                            .fillMaxWidth()
-                            .height(48.dp)
+                    val bottomCornerRadius by animateDpAsState(
+                        targetValue = if (designAndBuildExpanded) 0.dp else 16.dp,
+                        animationSpec = tween(durationMillis = 250)
                     )
+
+                    Column {
+                        TextField(
+                            value = selectedDesignAndBuild,
+                            onValueChange = {},
+                            readOnly = true,
+                            textStyle = MaterialTheme.typography.bodyLarge.copy(
+                                fontSize = 14.sp
+                            ),
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = designAndBuildExpanded)
+                            },
+                            modifier = Modifier
+                                .menuAnchor()
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            shape = RoundedCornerShape(
+                                topStart = 16.dp,
+                                topEnd = 16.dp,
+                                bottomStart = bottomCornerRadius,
+                                bottomEnd = bottomCornerRadius
+                            ),
+                            colors = TextFieldDefaults.colors(
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent
+                            )
+                        )
+
+                        if (designAndBuildExpanded) {
+                            Spacer(modifier = Modifier.height(2.dp))
+                        }
+                    }
 
                     ExposedDropdownMenu(
                         expanded = designAndBuildExpanded,
-                        onDismissRequest = { designAndBuildExpanded = false }
+                        onDismissRequest = { designAndBuildExpanded = false },
+                        modifier = Modifier.offset(y = 4.dp),
+                        shape = RoundedCornerShape(
+                            topStart = 0.dp,
+                            topEnd = 0.dp,
+                            bottomStart = 16.dp,
+                            bottomEnd = 16.dp
+                        )
                     ) {
                         designAndBuildOptions.forEach { type ->
                             DropdownMenuItem(
@@ -366,7 +534,7 @@ fun GeneralInformationScreen(
                     color = MaterialTheme.colorScheme.surfaceBright,
                     fontSize = 12.sp,
                     modifier = Modifier.padding(
-                        bottom = 5.dp
+                        bottom = 7.dp
                     )
                 )
                 TextField(
@@ -386,7 +554,12 @@ fun GeneralInformationScreen(
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(48.dp)
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    )
                 )
             }
             Spacer(modifier = Modifier
@@ -407,16 +580,41 @@ fun GeneralInformationScreen(
             Box(modifier = Modifier)
             Button(
                 onClick = {
-                    viewModel.setGeneralInformationValues(
-                        projectName,
-                        selectedProjectType,
-                        selectedClientType,
-                        selectedContractType,
-                        if (selectedDesignAndBuild == "Yes") true else false,
-                        numberOfMainTasks.toInt()
-                    )
+                    val num = numberOfMainTasks.toIntOrNull()
 
-                    navController.navigate(Screen.NewProjectTechnicalScope.name)
+                    when {
+                        projectName.isBlank() -> {
+                            dialogMessage = "Project name cannot be empty."
+                            showDialog = true
+                        }
+                        selectedProjectType.isBlank() -> {
+                            dialogMessage = "Please select a project type."
+                            showDialog = true
+                        }
+                        selectedClientType.isBlank() -> {
+                            dialogMessage = "Please select a client type."
+                            showDialog = true
+                        }
+                        selectedContractType.isBlank() -> {
+                            dialogMessage = "Please select a contract type."
+                            showDialog = true
+                        }
+                        num == null || num <= 0 -> {
+                            dialogMessage = "Number of main tasks must be greater than zero."
+                            showDialog = true
+                        }
+                        else -> {
+                            viewModel.setGeneralInformationValues(
+                                projectName,
+                                selectedProjectType,
+                                selectedClientType,
+                                selectedContractType,
+                                if (selectedDesignAndBuild == "Yes") true else false,
+                                num
+                            )
+                            navController.navigate(Screen.NewProjectTechnicalScope.name)
+                        }
+                    }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
                 modifier = Modifier
@@ -438,6 +636,18 @@ fun GeneralInformationScreen(
                     )
                 }
             }
+        }
+        if (showDialog) {
+            androidx.compose.material3.AlertDialog(
+                onDismissRequest = { showDialog = false },
+                confirmButton = {
+                    Button(onClick = { showDialog = false }) {
+                        Text("OK")
+                    }
+                },
+                title = { Text("Invalid Input") },
+                text = { Text(dialogMessage) }
+            )
         }
     }
 }

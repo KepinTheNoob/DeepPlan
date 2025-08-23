@@ -155,9 +155,9 @@ class NewProjectViewModel: ViewModel() {
             currentState.copy(
                 goodPrediction = (
                         uiState.value.terjadi_keterlambatan_signifikan == "No" &&
-                        uiState.value.terjadi_pembengkakan_biaya_signifikan == "No" &&
-                        uiState.value.profit_margin_riil_persen >= 5
-                )
+                                uiState.value.terjadi_pembengkakan_biaya_signifikan == "No" &&
+                                uiState.value.profit_margin_riil_persen >= 5
+                        )
             )
         }
         Log.d("Loading Prediction", "biaya akhir: ${uiState.value.biaya_akhir_riil_miliar_rp.toString()}")
@@ -276,7 +276,7 @@ class NewProjectViewModel: ViewModel() {
             "profit_margin_riil_persen" to uiState.value.profit_margin_riil_persen,
             "terjadi_keterlambatan_signifikan" to uiState.value.terjadi_keterlambatan_signifikan,
             "terjadi_pembengkakan_biaya_signifikan" to uiState.value.terjadi_pembengkakan_biaya_signifikan,
-            )
+        )
 
         db.collection("projects")
             .add(predictionResults)
