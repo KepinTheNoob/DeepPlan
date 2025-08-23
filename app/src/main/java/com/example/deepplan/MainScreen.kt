@@ -294,7 +294,22 @@ fun MainScreen(
     }
 
     when {
-        projectUiState.needToLoadProjects -> {
+        authState.value == AuthState.Unauthenticated -> {
+            Scaffold() { innerPadding ->
+                MainContent(
+                    startScreen = startScreen,
+                    navController = navController,
+                    innerPadding = innerPadding,
+                    newProjectViewModel = newProjectViewModel,
+                    authViewModel = authViewModel,
+                    manageProjectViewModel = manageProjectViewModel,
+                    projectDashboardViewModel = projectDashboardViewModel,
+                    projectViewModel = projectViewModel,
+                )
+            }
+        }
+
+        projectUiState.needToLoadProjects && authState.value == AuthState.Authenticated -> {
             CircularProgressIndicator()
         }
 

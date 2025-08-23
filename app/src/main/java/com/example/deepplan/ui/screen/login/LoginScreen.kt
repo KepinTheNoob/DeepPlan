@@ -238,22 +238,6 @@ fun Login(navController: NavHostController, authViewModel: AuthViewModel) {
                 }
                 Spacer(modifier = Modifier.height(16.dp))
 
-                OutlinedButton (
-                    onClick = {},
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
-                ) {
-                    Text(
-                        text = "Sign In with Google",
-                        style = TextStyle(
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    )
-                }
 
                 Spacer(modifier = Modifier.height(5.dp))
 
