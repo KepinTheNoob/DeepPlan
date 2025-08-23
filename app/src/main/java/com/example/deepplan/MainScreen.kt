@@ -266,26 +266,18 @@ fun MainScreen(
     val currentScreen = Screen.valueOf(
         backStackEntry?.destination?.route ?: Screen.ManageProject.name
     )
-    var startScreen by remember { mutableStateOf<Screen>(Screen.Home) }
+    var startScreen by remember { mutableStateOf<Screen>(Screen.ManageProject) }
 
     // Authentification
     val authState = authViewModel.authState.observeAsState()
 
-    LaunchedEffect(authState.value) {
-        Log.d("Auth", authState.value.toString())
-        when(authState.value) {
-            is AuthState.Authenticated -> startScreen = Screen.ManageProject
-            is AuthState.Error -> Toast.makeText(context,
-                (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT).show()
-            else -> startScreen = Screen.Login
-        }
-    }
 
     // Load Projects
     val projectUiState by projectViewModel.uiState.collectAsState()
 
     LaunchedEffect(projectUiState.needToLoadProjects) {
         if (projectUiState.needToLoadProjects && authState.value == AuthState.Authenticated) {
+                Log.d("Booting", "load project")
             projectViewModel.loadProjects()
             Log.d("Loading Project", "Successfully loaded the projects.")
         } else if (!(projectUiState.needToLoadProjects)) {
@@ -293,8 +285,37 @@ fun MainScreen(
         }
     }
 
+    LaunchedEffect(authState.value) {
+        Log.d("Auth", authState.value.toString())
+        when(authState.value) {
+            is AuthState.Authenticated -> startScreen = Screen.ManageProject
+            is AuthState.Error -> Toast.makeText(context,
+                (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT).show()
+            else -> {
+                Log.d("Booting", "here")
+                startScreen = Screen.Login
+            }
+        }
+    }
+
     when {
-        projectUiState.needToLoadProjects -> {
+        authState.value == AuthState.Unauthenticated -> {
+            Scaffold() { innerPadding ->
+                MainContent(
+                    startScreen = startScreen,
+                    navController = navController,
+                    innerPadding = innerPadding,
+                    newProjectViewModel = newProjectViewModel,
+                    authViewModel = authViewModel,
+                    manageProjectViewModel = manageProjectViewModel,
+                    projectDashboardViewModel = projectDashboardViewModel,
+                    projectViewModel = projectViewModel,
+                )
+            }
+        }
+
+        projectUiState.needToLoadProjects && authState.value == AuthState.Authenticated -> {
+            Log.d("Booting", "Load?")
             CircularProgressIndicator()
         }
 

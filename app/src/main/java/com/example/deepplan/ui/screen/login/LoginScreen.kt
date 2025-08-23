@@ -1,5 +1,6 @@
 package com.example.deepplan.ui.screen.login
 
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -51,6 +52,7 @@ import com.example.deepplan.R
 import com.example.deepplan.data.Screen
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 
 @Composable
 fun Login(navController: NavHostController, authViewModel: AuthViewModel) {
@@ -123,7 +125,9 @@ fun Login(navController: NavHostController, authViewModel: AuthViewModel) {
     val checkedState = remember { mutableStateOf(true) }
 
     Box (
-        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceTint),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surfaceTint),
     ) {
         Box(
             modifier = Modifier
@@ -157,7 +161,9 @@ fun Login(navController: NavHostController, authViewModel: AuthViewModel) {
         Image(
             painter = painterResource(R.drawable.shape_2),
             contentDescription = "Shape2",
-            modifier = Modifier.padding(top = 186.dp).align(Alignment.TopEnd),
+            modifier = Modifier
+                .padding(top = 186.dp)
+                .align(Alignment.TopEnd),
         )
 
         Image(
@@ -265,13 +271,17 @@ fun Login(navController: NavHostController, authViewModel: AuthViewModel) {
 
                 OutlinedButton (
                     onClick = {
-                        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                            .requestIdToken(context.getString(R.string.default_web_client_id))
-                            .requestEmail()
-                            .build()
-                        val client = GoogleSignIn.getClient(context, gso)
-                        launcher.launch(client.signInIntent)
-                    },
+                        try {
+                            val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                                .requestIdToken(context.getString(R.string.default_web_client_id))
+                                .requestEmail()
+                                .build()
+                            val client = GoogleSignIn.getClient(context, gso)
+                            launcher.launch(client.signInIntent)
+                        } catch (e: ApiException) {
+                            Log.d("Google sing in", e.statusCode.toString())
+                        }
+                    } ,
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier
                         .fillMaxWidth()
