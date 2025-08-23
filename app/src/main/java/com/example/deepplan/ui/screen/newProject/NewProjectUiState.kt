@@ -4,7 +4,7 @@ data class NewProjectUiState (
     val savedProjectId: String = "",
 
     // General Information
-    val projectName: String = "IKN",
+    val projectName: String = "",
     val projectType: String = "Jalan Tol",
     val clientType: String = "BUMN",
     val contractType: String = "Lump Sum",

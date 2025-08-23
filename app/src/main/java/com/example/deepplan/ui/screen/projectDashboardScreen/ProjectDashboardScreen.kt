@@ -5,8 +5,10 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -29,6 +32,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -48,6 +52,7 @@ import androidx.compose.ui.unit.sp
 import com.example.deepplan.R
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.clip
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -138,7 +143,12 @@ fun ProjectDashboardScreen(
         }
 
         else -> {
-            CircularProgressIndicator()
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
         }
     }
 
@@ -176,13 +186,16 @@ fun Home(
             )
         }
 
+        Box() {
+
+        }
         Column (
             modifier = Modifier
-                .padding(horizontal = 13.dp, vertical = 16.dp)
+                .padding(horizontal = 13.dp, vertical = 30.dp)
                 .background(MaterialTheme.colorScheme.onPrimary),
         ) {
             Column (
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
             ) {
                 Text(
                     text = uiState.projectName,
@@ -253,7 +266,7 @@ fun Home(
                     )
                 ) {
                     Column (
-                        modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 18.dp, end = 20.dp)
+                        modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 18.dp, end = 20.dp)
                     ) {
                         Text(
                             text = "Tip",
@@ -269,16 +282,6 @@ fun Home(
                         )
 
                         Spacer(modifier = Modifier.height(20.dp))
-
-                        Text(
-                            text = "I understand",
-                            style = TextStyle(
-                                color = MaterialTheme.colorScheme.primary,
-                                textAlign = TextAlign.Right,
-                                fontWeight = FontWeight.Bold
-                            ),
-                            modifier = Modifier.fillMaxWidth()
-                        )
                     }
                 }
 
@@ -326,18 +329,39 @@ fun Home(
 
                         TextField(
                             value = textBox,
-                            onValueChange = { textBox = it }
+                            onValueChange = { textBox = it },
+                            textStyle = MaterialTheme.typography.bodyLarge.copy(
+                                fontSize = 14.sp
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp)
+                                .border(width = 1.dp, color = MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(16.dp)),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = TextFieldDefaults.colors(
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent
+                            )
                         )
-                        Button(
-                            onClick = {
-                                viewModel.generateTasks(textBox)
+                        Box(modifier = Modifier.fillMaxSize()
+                            .padding(top = 16.dp),
+                            contentAlignment = Alignment.Center) {
+                            Button(
+                                onClick = {
+                                    viewModel.generateTasks(textBox)
+                                }
+                            ) {
+                                Text(text = "Generate Planning")
                             }
-                        ) {
-                            Text(text = "Generate Planning")
                         }
                     }
                 } else if (!showPlan) {
-                    CircularProgressIndicator()
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
                 } else if (showPlan && uiState.tasks.isNotEmpty()) {
                     GanttChartComposable(uiState.tasks)
 
@@ -350,18 +374,19 @@ fun Home(
                             modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 18.dp, end = 20.dp)
                         ) {
                             Text(
-                                text = "To-do list",
+                                text = "Task",
                                 style = TextStyle(
                                     color = MaterialTheme.colorScheme.onSurface,
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold
-                                )
+                                ),
+                                modifier = Modifier.padding(top = 10.dp)
                             )
 
                             Spacer(modifier = Modifier.height(22.dp))
 
                             Text(
-                                text = "A dialog is a type of modal window that appears in front of app content to provide critical information, or prompt for a decision to be made."
+                                text = "Complete the tasks below and check the boxes as you go. Your project progress will update automatically."
                             )
 
                             Spacer(modifier = Modifier.height(40.dp))
@@ -383,14 +408,30 @@ fun Home(
 
                     TextField(
                         value = textBox,
-                        onValueChange = { textBox = it }
+                        onValueChange = { textBox = it },
+                        textStyle = MaterialTheme.typography.bodyLarge.copy(
+                            fontSize = 14.sp
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp)
+                            .border(width = 1.dp, color = MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(16.dp)),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = TextFieldDefaults.colors(
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
+                        )
                     )
-                    Button(
-                        onClick = {
-                            viewModel.generateTasks(textBox, true)
+                    Box(modifier = Modifier.fillMaxSize()
+                        .padding(top = 16.dp),
+                        contentAlignment = Alignment.Center) {
+                        Button(
+                            onClick = {
+                                viewModel.generateTasks(textBox, true)
+                            }
+                        ) {
+                            Text(text = "Regenerate Planning")
                         }
-                    ) {
-                        Text(text = "Regenerate Planning")
                     }
 
                 }
@@ -776,17 +817,18 @@ fun CheckList(
     projectViewModel: ProjectViewModel
 ) {
     val uiState by viewModel.uiState.collectAsState()
-
     val tasks = uiState.tasks
 
     Column (
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surfaceContainer)
+            .padding(horizontal = 8.dp)
     ) {
         tasks.forEachIndexed { index, item ->
             Row (
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
+                    .padding(horizontal = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -796,6 +838,8 @@ fun CheckList(
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Normal
                     ),
+                    modifier = Modifier.weight(1f)
+                        .padding(end = 8.dp)
                 )
 
                 Checkbox(
@@ -825,32 +869,7 @@ fun CheckList(
             }
         }
 
-        Spacer(modifier = Modifier.height(42.dp))
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(end = 28.dp),
-            horizontalArrangement = Arrangement.End
-        ) {
-            Text(
-                text = "Add",
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.clickable {  }
-            )
-
-            Spacer(modifier = Modifier.width(47.dp))
-
-            Text(
-                text = "Edit",
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.clickable {  }
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
-        }
+        Spacer(modifier = Modifier.height(12.dp))
     }
 }
 

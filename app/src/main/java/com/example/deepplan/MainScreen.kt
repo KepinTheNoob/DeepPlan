@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -43,6 +44,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -107,14 +109,14 @@ fun MainScreenBar(
                         )
                     }
 
-                    IconButton (
-                        onClick = {},
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.trailing_elements),
-                            contentDescription = "Back",
-                        )
-                    }
+//                    IconButton (
+//                        onClick = {},
+//                    ) {
+//                        Icon(
+//                            painter = painterResource(R.drawable.trailing_elements),
+//                            contentDescription = "Back",
+//                        )
+//                    }
                 }
             } else if (currentScreen in listOf<Screen>(
                     Screen.NewProjectGeneralInformation,
@@ -310,7 +312,12 @@ fun MainScreen(
                     Log.d("Loading Project", "Project loaded: " + projectUiState.projects.toString())
                 }
             }
-            CircularProgressIndicator()
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
         }
 
         !(projectUiState.needToLoadProjects) -> {

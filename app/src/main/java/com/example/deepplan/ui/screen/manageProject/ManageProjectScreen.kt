@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -111,7 +112,7 @@ fun ManageProjectScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(0.4f) // Takes up a portion of the screen height
+                    .weight(0.4f)
                     .background(MaterialTheme.colorScheme.primary)
             ) {
                 Text(
@@ -129,6 +130,7 @@ fun ManageProjectScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(0.6f)
+                    .background(MaterialTheme.colorScheme.onPrimary)
                     .padding(horizontal = 24.dp)
             ) {
                 // "Your projects" header
@@ -178,7 +180,9 @@ fun ManageProjectScreen(
                             // Project list (or empty state)
                             if (uiState.projects.isNotEmpty()) {
                                 LazyColumn(
-                                    modifier = Modifier.fillMaxSize()
+                                    modifier = Modifier.fillMaxSize(),
+                                    verticalArrangement = Arrangement.spacedBy(12.dp)
+
                                 ) {
                                     items(uiState.projects) { project ->
                                         ProjectCard(
@@ -202,7 +206,6 @@ fun ManageProjectScreen(
                                 )
                             }
 
-                            // ✅ Button is now "anchored" at the bottom right
                             Button(
                                 onClick = { navController.navigate(Screen.NewProjectGeneralInformation.name) },
                                 shape = RoundedCornerShape(50),
@@ -274,7 +277,8 @@ fun ProjectCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp)),
+            .clip(RoundedCornerShape(12.dp))
+            .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp)),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
         onClick = {
             projectDashboardViewModel.setProjectId(project.id)
