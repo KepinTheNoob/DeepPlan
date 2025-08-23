@@ -264,7 +264,7 @@ fun MainScreen(
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = Screen.valueOf(
-        backStackEntry?.destination?.route ?: Screen.ManageProject.name
+        backStackEntry?.destination?.route ?: Screen.Login.name
     )
     var startScreen by remember { mutableStateOf<Screen>(Screen.Home) }
 
@@ -284,14 +284,6 @@ fun MainScreen(
     // Load Projects
     val projectUiState by projectViewModel.uiState.collectAsState()
 
-    LaunchedEffect(projectUiState.needToLoadProjects) {
-        if (projectUiState.needToLoadProjects && authState.value == AuthState.Authenticated) {
-            projectViewModel.loadProjects()
-            Log.d("Loading Project", "Successfully loaded the projects.")
-        } else if (!(projectUiState.needToLoadProjects)) {
-            Log.d("Loading Project", "Project loaded: " + projectUiState.projects.toString())
-        }
-    }
 
     when {
         authState.value == AuthState.Unauthenticated -> {
@@ -310,6 +302,14 @@ fun MainScreen(
         }
 
         projectUiState.needToLoadProjects && authState.value == AuthState.Authenticated -> {
+            LaunchedEffect(projectUiState.needToLoadProjects) {
+                if (projectUiState.needToLoadProjects && authState.value == AuthState.Authenticated) {
+                    projectViewModel.loadProjects()
+                    Log.d("Loading Project", "Successfully loaded the projects.")
+                } else if (!(projectUiState.needToLoadProjects)) {
+                    Log.d("Loading Project", "Project loaded: " + projectUiState.projects.toString())
+                }
+            }
             CircularProgressIndicator()
         }
 
