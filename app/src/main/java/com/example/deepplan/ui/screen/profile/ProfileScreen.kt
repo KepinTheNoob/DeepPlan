@@ -81,7 +81,7 @@ fun ProfileUI(
             Spacer(modifier = Modifier.height(14.dp))
 
             Text(
-                text = "Jefferson Darren Cendres",
+                text = username,
                 style = TextStyle(
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,

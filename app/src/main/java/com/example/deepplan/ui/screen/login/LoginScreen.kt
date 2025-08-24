@@ -39,6 +39,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,17 +60,6 @@ fun Login(navController: NavHostController, authViewModel: AuthViewModel) {
 
     val authState = authViewModel.authState.observeAsState()
     val context = LocalContext.current
-
-//    LaunchedEffect(authState.value) {
-//        when(authState.value) {
-//            is AuthState.Authenticated -> navController.navigate(Screen.Home.name) {
-//                popUpTo(Screen.Login.name) { inclusive = true }
-//            }
-//            is AuthState.Error -> Toast.makeText(context,
-//                (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT).show()
-//            else -> Unit
-//        }
-//    }
 
     LaunchedEffect(authState.value) {
         when (authState.value) {
@@ -195,6 +185,7 @@ fun Login(navController: NavHostController, authViewModel: AuthViewModel) {
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
+                    singleLine = true,
                     label = {
                         Text(
                             text = "Enter your password here",
@@ -206,7 +197,8 @@ fun Login(navController: NavHostController, authViewModel: AuthViewModel) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 5.dp),
-                    shape = RoundedCornerShape(15.dp)
+                    shape = RoundedCornerShape(15.dp),
+                    visualTransformation = PasswordVisualTransformation(),
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -233,46 +225,6 @@ fun Login(navController: NavHostController, authViewModel: AuthViewModel) {
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
-                        )
-                    )
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-
-
-                Spacer(modifier = Modifier.height(5.dp))
-
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier.size(24.dp)
-                        ) {
-                            Checkbox(
-                                checked = checkedState.value,
-                                onCheckedChange = { checkedState.value = it },
-                                modifier = Modifier.size(14.dp)
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.width(9.dp))
-
-                        Text(
-                            text = "Remember me",
-                            style = TextStyle(
-                                fontSize = 11.sp,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        )
-                    }
-
-                    Text(
-                        text = "Forgot password?",
-                        color = MaterialTheme.colorScheme.surfaceTint,
-                        style = TextStyle(
-                            fontSize = 11.sp
                         )
                     )
                 }
